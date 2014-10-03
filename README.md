@@ -43,9 +43,12 @@ Q4. Does VGI have a potential to impact governance?
 
 ## How to run the scripts
 
-1. download the file `rawData.csv` in your working folder.
-2. Run the script `cleaning.R`, which produces the file `reviewData.rda`
-3. Run the script `analytics.R` over the file in step 2.
+To reproduce all analysis steps:
 
-Alternativelly: download `reviewData.rda` and go to step 3.
+1. Update the variable `workingPath` in script `cleaning.R` to your local working directory.
+2. Run the script `cleaning.R`, which downloads the required input data and produces the file `reviewData.rda` in your working directory.  
+3. Update the variable `workingPath` in script `analytics.R` to your local working directory.
+4. Run the script `analytics.R` which takes the file in step 2 as input. 
+
+Alternatively, go straight to step 3 to skip data cleaning step.
 
