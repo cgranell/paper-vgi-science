@@ -6,16 +6,24 @@
 library(ggplot2)## ggplot
 library(plyr)   ## ddply
 
-workingPath <- "C:/Users/cgranell/Data/MyCodeDev/papers-vgi-science/"
+workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
-load("./data/reviewData.rda")
 
-# Note: object in is called "data"
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/reviewData.rda"
+dataFile <- "reviewData.rda"
+pathToDataFile <- paste("./data/", dataFile, sep="")
+
+if (!file.exists(pathToDataFile)) {
+    file <- download.file(url, destfile=pathToDataFile)
+}
+
+load(pathToDataFile)
+
+# Note: dateset is loaded into R object called "data"
 summary(data)
 
 # number of representative papers 
 numPapers <- length(unique(data$p.id))  # 57
-numPapers
 
 
 ######################################################
