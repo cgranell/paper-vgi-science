@@ -1,7 +1,7 @@
 # Role of VGI in Science
 
 ## Synopsis
-This is a bit of exploration to discover general current analytical trends applied to the use of VGI (Volunteered Geographic Information) in scientific contexts in general and GIScience in particular. The aim is to perform a systematic mapping review to know the focus and intended use of VGI along with the type of data analsysis and analitical methods used. We are aware that VGI is being used in multiple domains (health monitoring, health prediction adn detection, environmental monitoring, citizen science, data journalism, social sciences, etc) but here the representaive set of papers is mainly limited to the field of natural harzards and crisis management, for which there exists a great deal of related literature since these tow domains have been traditionaly early adopters of VGI.
+This is a bit of exploration to discover current trends in analysis methods applied to the use of VGI (Volunteered Geographic Information) in scientific contexts in general and GIScience in particular. The aim is to perform a systematic mapping review to know the focus and intended use of VGI along with the type of data analsysis and analitical methods used. We are aware that VGI is being used in multiple domains (health monitoring, health prediction adn detection, environmental monitoring, citizen science, data journalism, social sciences, etc) but here the representaive set of papers is mainly limited to the field of natural harzards and crisis management, for which there exists a great deal of related literature since these tow domains have been traditionaly early adopters of VGI.
 
 ## Context
 
