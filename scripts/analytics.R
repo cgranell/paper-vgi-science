@@ -88,20 +88,18 @@ subsetVenues0 <- ddply(subsetVenues, c("p.venue", "p.venuetype"), summarise,
 
 ## graph of counts, reorder() to show counts of "p.venue" in order
 ggplot(subsetVenues0, aes(x=reorder(p.venue, countVenue), y=countVenue, fill=p.venuetype)) +
-    geom_bar(stat="bin") + coord_flip() + 
-    #theme_bw(base_family = "sans family", base_size=10) + 
-    theme_bw(base_size=10) + 
+    geom_bar(stat="identity") + coord_flip() + 
+    theme_bw(base_family = "Avenir", base_size=10) + 
     labs(x = "Venues") + 
     labs(y = "Count") + 
-    labs(title = "Main venues") +
+    labs(title = "Counts of venues") +
     geom_text(aes(label=countVenue), hjust=1.5, colour="white")
 
 
 #### What are the most popular venues (> 1 occurrence)?
 ggplot(subsetVenues0[subsetVenues0$countVenue>1,], aes(x=reorder(p.venue, countVenue), y=countVenue, fill=p.venuetype)) +
-    geom_bar(stat="bin") + coord_flip() +
-    #theme_bw(base_family = "Avenir", base_size=10) + 
-    theme_bw(base_size=10) + 
+    geom_bar(stat="identity") + coord_flip() +
+    theme_bw(base_family = "Avenir", base_size=10) + 
     labs(x = "Venues") + 
     labs(y = "Count") + 
     labs(title = "Most popular venues") +
@@ -124,19 +122,20 @@ subsetSources0 <- ddply(subsetSources, c("d.source"), summarise,
 
 ## graph of counts, reorder to show counts of "d.source" in order
 ggplot(subsetSources0, aes(x=reorder(d.source, countSource), y=countSource)) +
-    geom_bar(stat="bin") + coord_flip() +
-    #theme_bw(base_family = "Avenir", base_size=10) + 
-    theme_bw(base_size=10) + 
+    geom_bar(stat="identity") + coord_flip() +
+    theme_bw(base_family = "Avenir", base_size=10) + 
     labs(x = "Source") + 
     labs(y = "Count") + 
-    labs(title = "Main VGI sources") +
+    labs(title = "Counts of main VGI sources") +
     geom_text(aes(label=countSource), hjust=1.5, colour="white")
 
 #### What are the most popular sources? 
 ## we must "read" the previous plot accordingly
+## Twitter is by large the most used data source, followed by Flickr
 
 #### Are sources used in isolation or in combination?
 ## we must "read" the previous plot accordingly
+## Most studies used one data source in isolation. Combination of distinct data sources is a rare exception
 
 
 #################
@@ -162,12 +161,11 @@ subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise,
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
     geom_bar(stat="identity") + coord_flip() +
-    #theme_bw(base_family = "Avenir", base_size=10) + 
-    theme_bw(base_size=10) + 
+    theme_bw(base_family = "Avenir", base_size=10) + 
     geom_text(aes(label=countCat0), hjust=1.5, colour="white") +
     labs(x = "Focus") + 
     labs(y = "Count") + 
-    labs(title = "Main categories")
+    labs(title = "Counts of main categories (fcat0) broken by focus (fcat1)")
 
 
 #### What are the most frequently focus within each category?
@@ -178,13 +176,12 @@ subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise,
 
 ggplot(subsetCat1, aes(x=reorder(f.cat1, countCat1), y=countCat1, fill=f.cat0)) +
     geom_bar(stat="identity") + coord_flip() +
-    #theme_bw(base_family = "Avenir", base_size=10) + 
-    theme_bw(base_size=10) + 
+    theme_bw(base_family = "Avenir", base_size=10) + 
     theme(panel.grid.major.y = element_blank()) +
     geom_text(aes(label=countCat1), hjust=1.5, colour="white") +
     labs(x = "Focus") + 
     labs(y = "Count") + 
-    labs(title = "Main focus broken by categories")
+    labs(title = "Counts of intended use (fcat2) broken by focus (fcat1) and main categories (fcat0)")
 
 
 #### What are the most frequently intended uses within each focus?
@@ -195,13 +192,12 @@ subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise,
 
 ggplot(subsetCat2, aes(x=reorder(f.cat2, countCat2), y=countCat2, fill=f.cat1)) +
     geom_bar(stat="identity") + coord_flip() +
-    #theme_bw(base_family = "Avenir", base_size=10) + 
-    theme_bw(base_size=10) + 
+    theme_bw(base_family = "Avenir", base_size=10) + 
     theme(panel.grid.major.y = element_blank()) +   # No horizontal grid lines
     geom_text(aes(label=countCat2), hjust=1.5, colour="white") +
     labs(x = "Intended uses") + 
     labs(y = "Count") + 
-    labs(title = "Intended uses broken by focus") 
+    labs(title = "Counts of intended use (fcat2) broken by focus (fcat1)") 
     
 
 # Alternative graph: Split subsetCat2 into 3 dataframes by f.cat0. 
@@ -209,42 +205,38 @@ ggplot(subsetCat2, aes(x=reorder(f.cat2, countCat2), y=countCat2, fill=f.cat1)) 
 dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
 
 ggplot(dataCentric, aes(x=f.cat1, y=f.cat2)) +
-    geom_point(aes(size=countCat2), shape=21, colour="black", fill="cornsilk") +
-    #theme_bw(base_family = "Avenir", base_size=10) +
-    theme_bw(base_size=10) +
+    geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
+    theme_bw(base_family = "Avenir", base_size=10) +
     scale_size_area(max_size=15, guide=FALSE) +
-    labs(x = "Focus ") + 
-    labs(y = "Intended uses") + 
+    labs(x = "Focus (fcat1)") + 
+    labs(y = "Intended uses (fcat2)") + 
     labs(title = "Data-centric category broken by Focus and Intended Use") +
-    theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) # Rotating the text 30 degrees
-    #geom_text(aes(y=as.numeric(f.cat2)-sqrt(countCat2)/15, label=countCat2), vjust=1, colour="grey60", size=4)
+    theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) + # Rotating the text 30 degrees
+    geom_text(aes(label=countCat2), vjust=0, colour="grey30", size=3)   # Add labels from data
 
 humanCentric <- subset(subsetCat2,f.cat0=="human-centric")
 
 ggplot(humanCentric, aes(x=f.cat1, y=f.cat2)) +
-    geom_point(aes(size=countCat2), shape=21, colour="black", fill="cornsilk") +
-    #theme_bw(base_family = "Avenir", base_size=10) +
-    theme_bw(base_size=10) +
+    geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
+    theme_bw(base_family = "Avenir", base_size=10) +
     scale_size_area(max_size=15, guide=FALSE) +
-    labs(x = "Focus ") + 
-    labs(y = "Intended uses") + 
+    labs(x = "Focus (fcat1)") + 
+    labs(y = "Intended uses (fcat2)") + 
     labs(title = "Human-centric category broken by Focus and Intended Use") +
-    theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) # Rotating the text 30 degrees
+    theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) + # Rotating the text 30 degrees
+    geom_text(aes(label=countCat2), vjust=0, colour="grey30", size=3)   # Add labels from data
     
-#geom_text(aes(y=as.numeric(f.cat2)-sqrt(countCat2)/15, label=countCat2), vjust=1, colour="grey60", size=4)
-
 crisisCentric <- subset(subsetCat2,f.cat0=="crisis-centric")
 
 ggplot(crisisCentric, aes(x=f.cat1, y=f.cat2)) +
-    geom_point(aes(size=countCat2), shape=21, colour="black", fill="cornsilk") +
-    #theme_bw(base_family = "Avenir", base_size=10) +
-    theme_bw(base_size=10) +
+    geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
+    theme_bw(base_family = "Avenir", base_size=10) +
     scale_size_area(max_size=15, guide=FALSE) +
-    labs(x = "Focus ") + 
-    labs(y = "Intended uses") +
+    labs(x = "Focus (fcat1)") + 
+    labs(y = "Intended uses (fcat2)") +
     labs(title = "Crisis-centric category broken by Focus and Intended Use") +
-    theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) # Rotating the text 30 degrees
-#geom_text(aes(y=as.numeric(f.cat2)-sqrt(countCat2)/15, label=countCat2), vjust=1, colour="grey60", size=4)
+    theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) + # Rotating the text 30 degrees
+    geom_text(aes(label=countCat2), vjust=0, colour="grey30", size=3)   # Add labels from data
 
 
 #################
