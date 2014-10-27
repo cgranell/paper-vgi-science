@@ -5,6 +5,7 @@
 
 library(ggplot2)## ggplot
 library(plyr)   ## ddply
+library(xtable)
 
 workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
@@ -96,6 +97,12 @@ ggplot(subsetVenues0, aes(x=reorder(p.venue, countVenue), y=countVenue, fill=p.v
     geom_text(aes(label=countVenue), hjust=1.5, colour="white")
 
 
+
+## Print list of venues in a tabular format (latex) to add it to the paper as annex
+subsetVenues0.table <- xtable(subsetVenues0)
+print(subsetVenues0.table, floating=FALSE)
+
+
 #### What are the most popular venues (> 1 occurrence)?
 ggplot(subsetVenues0[subsetVenues0$countVenue>1,], aes(x=reorder(p.venue, countVenue), y=countVenue, fill=p.venuetype)) +
     geom_bar(stat="identity") + coord_flip() +
@@ -127,7 +134,9 @@ ggplot(subsetSources0, aes(x=reorder(d.source, countSource), y=countSource)) +
     labs(x = "Source") + 
     labs(y = "Count") + 
     labs(title = "Counts of main VGI sources") +
-    geom_text(aes(label=countSource), hjust=1.5, colour="white")
+    geom_text(aes(label=countSource), hjust=1.5, colour="white") +
+    theme(panel.grid.major.y = element_blank(),
+          panel.grid.minor.y = element_blank()) # Hide the horizontal grid lines
 
 #### What are the most popular sources? 
 ## we must "read" the previous plot accordingly
@@ -153,35 +162,54 @@ ggplot(subsetSources0, aes(x=reorder(d.source, countSource), y=countSource)) +
 subsetCat <- data[,c("f.cat0","f.cat1", "f.cat2", "p.year")]
 
 
-#### What are the main categories of the paper?
+#### What are the distribution of papers along the main categories?
 ## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
 subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise, 
                     countCat0  = length(f.cat0))
 
+
+ppi=300
+jpeg(filename = "./figures/fig04.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
+
 ## graph of counts, reorder to show counts of "f.cat0" in order
-ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
-    geom_bar(stat="identity") + coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) + 
-    geom_text(aes(label=countCat0), hjust=1.5, colour="white") +
-    labs(x = "Focus") + 
-    labs(y = "Count") + 
-    labs(title = "Counts of main categories (fcat0) broken by focus (fcat1)")
+ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0)) +
+    geom_bar(stat="identity", width=0.6, colour="black", fill="lightblue") + 
+    #coord_flip() +
+    theme_bw(base_family = "Times", base_size=10) + 
+    geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
+    scale_y_continuous(breaks=c(seq(0,60,5))) +
+    labs(x = "Main categories") + 
+    labs(y = "Number of papers") + 
+    #labs(title = "Number of papers by main categories") +
+    theme(legend.position="none") + # remove legend
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
+dev.off()
 
 
-#### What are the most frequently focus within each category?
+#### What are the distribution of sub-categories/focuses within each category?
 ## Run the function length() on the value of "f.cat1" for each group (f.cat0, f.cat1) 
 ## to sum the ocurrences  of f.cat1 within each group
 subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
                         countCat1 = length(f.cat1))
 
-ggplot(subsetCat1, aes(x=reorder(f.cat1, countCat1), y=countCat1, fill=f.cat0)) +
-    geom_bar(stat="identity") + coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) + 
+
+ppi=300
+jpeg(filename = "./figures/fig05.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
+
+ggplot(subsetCat1, aes(x=reorder(f.cat1, f.cat0), y=countCat1, fill=f.cat0)) +
+    geom_bar(stat="identity", width=0.7, colour="black") + 
+    coord_flip() +
+    theme_bw(base_family = "Times", base_size=10) + 
     theme(panel.grid.major.y = element_blank()) +
-    geom_text(aes(label=countCat1), hjust=1.5, colour="white") +
-    labs(x = "Focus") + 
-    labs(y = "Count") + 
-    labs(title = "Counts of intended use (fcat2) broken by focus (fcat1) and main categories (fcat0)")
+    scale_fill_brewer("clarity") +
+    geom_text(aes(label=countCat1), hjust=1.5, colour="black", size=3) +
+    scale_y_continuous(breaks=c(seq(0,30,5))) +
+    labs(x = "Sub-category / focus") + 
+    labs(y = "Number of papers") +
+    guides(fill=guide_legend(title="Main categories"))  # Set the legend title
+    #labs(title = "Number of paper by focus (fcat1) and categories (fcat0)") +
+dev.off()    
 
 
 #### What are the most frequently intended uses within each focus?
