@@ -75,6 +75,10 @@ getUniqueSources <- function() {
 }
 
 
+percent <- function(x, digits = 2, format = "f", ...) {
+    paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+}
+
 #################
 ###  RQ: Publication venues
 #### What are the publication venues VGI research & data science have been published in? 
@@ -87,15 +91,44 @@ subsetVenues <- getUniqueVenues()
 subsetVenues0 <- ddply(subsetVenues, c("p.venue", "p.venuetype"), summarise, 
            countVenue  = as.integer(table(p.venue)))
 
-## graph of counts, reorder() to show counts of "p.venue" in order
-ggplot(subsetVenues0, aes(x=reorder(p.venue, countVenue), y=countVenue, fill=p.venuetype)) +
-    geom_bar(stat="identity") + coord_flip() + 
-    theme_bw(base_family = "Avenir", base_size=10) + 
-    labs(x = "Venues") + 
-    labs(y = "Count") + 
-    labs(title = "Counts of venues") +
-    geom_text(aes(label=countVenue), hjust=1.5, colour="white")
 
+# Journal and conference rates. Note that total is 56 because one paper is a technical report
+sumJournals <- sum(subsetVenues0[subsetVenues0$p.venuetype=="journal", c("countVenue")])
+sumConferences <- sum(subsetVenues0[subsetVenues0$p.venuetype=="conference", c("countVenue")])
+rateJournals <- (sumJournals / (sumJournals + sumConferences))
+rateConferences <- (sumConferences / (sumJournals + sumConferences))
+
+# Legend labels including  percent
+legendLabels = c(paste0("Journal: ", percent(rateJournals)), 
+                 paste0("Conference: ", percent(rateConferences)))
+
+# Get the publication venues (p.venue), sorted first by type, then by count  
+pubsorder <- subsetVenues0$p.venue[order(subsetVenues0$p.venuetype, subsetVenues0$countVenue)]
+# Turn p.venue into a factor, with levels in the order of pubs2order
+subsetVenues0$p.venue <- factor(subsetVenues0$p.venue, levels=pubsorder)
+
+
+ppi=300
+jpeg(filename = "./figures/fig0X-publications.jpg",width=9*ppi, height=9*ppi, res=ppi, quality=100)
+
+ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
+    geom_bar(stat="identity", width=0.6, colour="black") + 
+    coord_flip() + 
+    theme_bw(base_family = "Times", base_size=10) + 
+    scale_fill_brewer(palette="Set2") +
+    scale_y_continuous(breaks=c(seq(0,6,1))) +
+    labs(x = "Publication venues") + 
+    labs(y = "Counts of venue") + 
+    #labs(title = "Counts of venues by type") + 
+    labs(fill="Venue type") +   # set the legend title
+    theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
+    theme(legend.background=element_blank()) + # Remove overall border of legend
+    theme(legend.key=element_blank()) + # Remove border around each item of legend
+    scale_fill_discrete(labels=legendLabels) + # Change the legend labels
+    geom_text(aes(label=countVenue), hjust=1.5, colour="white", size=2.5) +
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
 
 
 ## Print list of venues in a tabular format (latex) to add it to the paper as annex
@@ -148,7 +181,7 @@ ggplot(subsetSources0, aes(x=reorder(d.source, countSource), y=countSource)) +
 
 
 #################
-### RQ: Focus/Intended  uses 
+### RQ 2: Focus/Intended  uses 
 #### What are the main categories of the paper?
 #### What are the most frequently focus within each category?
 #### What are the most frequently intended uses within the main focus?
@@ -193,7 +226,6 @@ dev.off()
 subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
                         countCat1 = length(f.cat1))
 
-
 ppi=300
 jpeg(filename = "./figures/fig05.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 
@@ -210,6 +242,58 @@ ggplot(subsetCat1, aes(x=reorder(f.cat1, f.cat0), y=countCat1, fill=f.cat0)) +
     guides(fill=guide_legend(title="Main categories"))  # Set the legend title
     #labs(title = "Number of paper by focus (fcat1) and categories (fcat0)") +
 dev.off()    
+
+#### What are the most frequently intended uses within each focus?
+## We use a dot plot faceted by focus (f.cat1)
+dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
+
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
+cat2order <- dataCentric$f.cat2[order(dataCentric$f.cat1, dataCentric$countCat2)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+dataCentric$f.cat2 <- factor(dataCentric$f.cat2, levels=cat2order)
+
+ppi=300
+jpeg(filename = "./figures/fig06-optionA.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+
+ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
+    geom_point(size=3, aes(colour=f.cat1)) +    # Use a larger dot
+    geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1", guide=FALSE) +
+    scale_x_continuous(breaks=c(seq(0,8,1))) +
+    labs(x = "Number") + 
+    labs(y = "Intended uses (fcat2)") + 
+    labs(title = "Data-centric category by Focus and Intended Use") +
+    theme(panel.grid.major.y = element_blank()) + # No horizontal grid lines
+    facet_grid(. ~ f.cat1, scales="free_y", space="free_y")
+  
+dev.off()
+
+ppi=300
+jpeg(filename = "./figures/fig06-optionB.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+
+ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
+    geom_point(size=3, aes(colour=f.cat1)) +    # Use a larger dot
+    geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_x_continuous(breaks=c(seq(0,8,1))) +
+    labs(x = "Number") + 
+    labs(y = "Intended uses (fcat2)") + 
+    labs(title = "Data-centric category broken by Focus and Intended Use") +
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
+
+ggplot(dataCentric, aes(x=f.cat1, y=f.cat2)) +
+    geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_size_area(max_size=15, guide=FALSE) +
+    labs(x = "Focus (fcat1)") + 
+    labs(y = "Intended uses (fcat2)") + 
+    labs(title = "Data-centric category broken by Focus and Intended Use") +
+    theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) + # Rotating the text 30 degrees
+    geom_text(aes(label=countCat2), vjust=0, colour="grey30", size=3)   # Add labels from data
 
 
 #### What are the most frequently intended uses within each focus?
@@ -229,9 +313,9 @@ ggplot(subsetCat2, aes(x=reorder(f.cat2, countCat2), y=countCat2, fill=f.cat1)) 
     
 
 # Alternative graph: Split subsetCat2 into 3 dataframes by f.cat0. 
-# Then create a balloon plot with f.cat1 adn f.cat2 as categorical axes
 dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
 
+# Then create a balloon plot with f.cat1 and f.cat2 as categorical axes
 ggplot(dataCentric, aes(x=f.cat1, y=f.cat2)) +
     geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
     theme_bw(base_family = "Avenir", base_size=10) +
