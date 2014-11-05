@@ -80,7 +80,7 @@ percent <- function(x, digits = 2, format = "f", ...) {
 }
 
 #################
-###  RQ: Publication venues
+###  RQ5: Publication venues
 #### What are the publication venues VGI research & data science have been published in? 
 #### What are the most popular venues (> 1 occurrence)?
 #################
@@ -99,8 +99,7 @@ rateJournals <- (sumJournals / (sumJournals + sumConferences))
 rateConferences <- (sumConferences / (sumJournals + sumConferences))
 
 # Legend labels including  percent
-legendLabels = c(paste0("Journal: ", percent(rateJournals)), 
-                 paste0("Conference: ", percent(rateConferences)))
+legend.txt = c(paste0("Journal: ", percent(rateJournals)), paste0("Conference: ", percent(rateConferences)))
 
 # Get the publication venues (p.venue), sorted first by type, then by count  
 pubsorder <- subsetVenues0$p.venue[order(subsetVenues0$p.venuetype, subsetVenues0$countVenue)]
@@ -108,6 +107,7 @@ pubsorder <- subsetVenues0$p.venue[order(subsetVenues0$p.venuetype, subsetVenues
 subsetVenues0$p.venue <- factor(subsetVenues0$p.venue, levels=pubsorder)
 
 
+############ FINAL FIGURE #################
 ppi=300
 jpeg(filename = "./figures/fig0X-publications.jpg",width=9*ppi, height=9*ppi, res=ppi, quality=100)
 
@@ -124,11 +124,12 @@ ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
     theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
     theme(legend.background=element_blank()) + # Remove overall border of legend
     theme(legend.key=element_blank()) + # Remove border around each item of legend
-    scale_fill_discrete(labels=legendLabels) + # Change the legend labels
+    scale_fill_discrete(labels=legend.txt) + # Change the legend labels
     geom_text(aes(label=countVenue), hjust=1.5, colour="white", size=2.5) +
     theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
 dev.off()
+############ END FINAL FIGURE #################
 
 
 ## Print list of venues in a tabular format (latex) to add it to the paper as annex
@@ -147,7 +148,7 @@ ggplot(subsetVenues0[subsetVenues0$countVenue>1,], aes(x=reorder(p.venue, countV
 
 
 #################
-### RQ: Data sources 
+### RQ3: Data sources 
 #### What are the most frequently VGI data sources? 
 #### What are the most popular sources? 
 #### Are sources used in isolation or in combination?
@@ -194,13 +195,12 @@ ggplot(subsetSources0, aes(x=reorder(d.source, countSource), y=countSource)) +
 
 subsetCat <- data[,c("f.cat0","f.cat1", "f.cat2", "p.year")]
 
-
 #### What are the distribution of papers along the main categories?
 ## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
 subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise, 
                     countCat0  = length(f.cat0))
 
-
+############ FINAL FIGURE #################
 ppi=300
 jpeg(filename = "./figures/fig04.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
 
@@ -218,7 +218,7 @@ ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0)) +
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
 dev.off()
-
+############ END FINAL FIGURE #################
 
 #### What are the distribution of sub-categories/focuses within each category?
 ## Run the function length() on the value of "f.cat1" for each group (f.cat0, f.cat1) 
@@ -226,6 +226,7 @@ dev.off()
 subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
                         countCat1 = length(f.cat1))
 
+############ FINAL FIGURE #################
 ppi=300
 jpeg(filename = "./figures/fig05.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 
@@ -243,8 +244,14 @@ ggplot(subsetCat1, aes(x=reorder(f.cat1, f.cat0), y=countCat1, fill=f.cat0)) +
     #labs(title = "Number of paper by focus (fcat1) and categories (fcat0)") +
 dev.off()    
 
+############ END FINAL FIGURE #################
+
 #### What are the most frequently intended uses within each focus?
-## We use a dot plot faceted by focus (f.cat1)
+## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
+## to sum the ocurrences  of f.cat2 within each group
+subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise, 
+                    countCat2 = length(f.cat2))
+
 dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
 
 # Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
@@ -252,9 +259,36 @@ cat2order <- dataCentric$f.cat2[order(dataCentric$f.cat1, dataCentric$countCat2)
 # Turn f.cat2 into a factor, with levels in the order of cat2order
 dataCentric$f.cat2 <- factor(dataCentric$f.cat2, levels=cat2order)
 
+# A trick to change legend title is to rename the column in the dataframe
+names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
+
+############ FINAL FIGURE #################
+ppi=300
+jpeg(filename = "./figures/fig06.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+
+ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
+    geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
+    geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_x_continuous(breaks=c(seq(0,15,1))) +
+    labs(x = "Number of papers") + 
+    labs(y = "Intended uses within data-centric category") + 
+    #labs(title = "Data-centric category broken by Focus and Intended Use") +
+    theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
+    theme(legend.background=element_blank()) + # Remove overall border of legend
+    #theme(legend.key=element_blank()) + # Remove border around each item of legend
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
+############ END FINAL FIGURE #################
+names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
+
+
 ppi=300
 jpeg(filename = "./figures/fig06-optionA.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
+## We use a dot plot faceted by focus (f.cat1)
 ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=f.cat1)) +    # Use a larger dot
     geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
@@ -269,21 +303,6 @@ ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +
   
 dev.off()
 
-ppi=300
-jpeg(filename = "./figures/fig06-optionB.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
-
-ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
-    geom_point(size=3, aes(colour=f.cat1)) +    # Use a larger dot
-    geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
-    theme_bw(base_family = "Avenir", base_size=10) +
-    scale_colour_brewer(palette="Set1") +
-    scale_x_continuous(breaks=c(seq(0,8,1))) +
-    labs(x = "Number") + 
-    labs(y = "Intended uses (fcat2)") + 
-    labs(title = "Data-centric category broken by Focus and Intended Use") +
-    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
-
-dev.off()
 
 ggplot(dataCentric, aes(x=f.cat1, y=f.cat2)) +
     geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
@@ -297,10 +316,7 @@ ggplot(dataCentric, aes(x=f.cat1, y=f.cat2)) +
 
 
 #### What are the most frequently intended uses within each focus?
-## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
-## to sum the ocurrences  of f.cat2 within each group
-subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise, 
-                    countCat2 = length(f.cat2))
+
 
 ggplot(subsetCat2, aes(x=reorder(f.cat2, countCat2), y=countCat2, fill=f.cat1)) +
     geom_bar(stat="identity") + coord_flip() +
@@ -326,7 +342,39 @@ ggplot(dataCentric, aes(x=f.cat1, y=f.cat2)) +
     theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) + # Rotating the text 30 degrees
     geom_text(aes(label=countCat2), vjust=0, colour="grey30", size=3)   # Add labels from data
 
+
 humanCentric <- subset(subsetCat2,f.cat0=="human-centric")
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
+cat2order <- humanCentric$f.cat2[order(humanCentric$f.cat1, humanCentric$countCat2)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+humanCentric$f.cat2 <- factor(humanCentric$f.cat2, levels=cat2order)
+
+# A trick to change legend title is to rename the column in the dataframe
+names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
+
+############ FINAL FIGURE #################
+ppi=300
+jpeg(filename = "./figures/fig07.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
+
+ggplot(humanCentric, aes(x=countCat2, y=f.cat2)) +    
+    geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
+    geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_x_continuous(breaks=c(seq(0,3,1))) +
+    labs(x = "Number of papers") + 
+    labs(y = "Intended uses within human-centric category") + 
+    #labs(title = "Data-centric category broken by Focus and Intended Use") +
+    #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    #theme(legend.background=element_blank()) + # Remove overall border of legend
+    #theme(legend.key=element_blank()) + # Remove border around each item of legend
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
+############ END FINAL FIGURE #################
+names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
+
+
 
 ggplot(humanCentric, aes(x=f.cat1, y=f.cat2)) +
     geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +

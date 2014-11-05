@@ -45,6 +45,24 @@ data$f.user <- as.factor(data$f.user)
 data$d.source <- as.factor(data$d.source)
 
 
+# We group some intended uses (f.cat2) which are quite similar. This will ease readiness:
+# "topic classification" and "topic selection" are integrated into 
+# the existing "topic selection and classification" 
+levels(data$f.cat2)[levels(data$f.cat2)=="topic classification"] <- "topic selection and classification"
+levels(data$f.cat2)[levels(data$f.cat2)=="topic selection"] <- "topic selection and classification"
+
+# "location classification" and location selection" are integrated into 
+# the existing "location selection and classification" level
+levels(data$f.cat2)[levels(data$f.cat2)=="location classification"] <- "location selection and classification"
+levels(data$f.cat2)[levels(data$f.cat2)=="location selection"] <- "location selection and classification"
+
+# "actionable information" and "credible information" form a new level named "actionable and credible information"
+levels(data$f.cat2)[levels(data$f.cat2)=="actionable information"] <- "actionable and credible information"
+levels(data$f.cat2)[levels(data$f.cat2)=="credible information"] <- "actionable and credible information"
+
+# fixed typo: "commuting behabiours" --> "commuting behaviours"
+levels(data$f.cat2)[levels(data$f.cat2)=="commuting behabiours"] <- "commuting behaviours"
+
 # number of representative papers 
 length(unique(data$p.id))  # 57
 
