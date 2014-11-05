@@ -132,10 +132,8 @@ dev.off()
 ############ END FINAL FIGURE #################
 
 
-## Print list of venues in a tabular format (latex) to add it to the paper as annex
-subsetVenues0.table <- xtable(subsetVenues0)
-print(subsetVenues0.table, floating=FALSE)
-
+## Print list of venues in a tabular format to add it to the paper as annex
+print.data.frame(subsetVenues0[,c("p.venue", "p.venuetype")])
 
 #### What are the most popular venues (> 1 occurrence)?
 ggplot(subsetVenues0[subsetVenues0$countVenue>1,], aes(x=reorder(p.venue, countVenue), y=countVenue, fill=p.venuetype)) +
@@ -284,7 +282,6 @@ dev.off()
 ############ END FINAL FIGURE #################
 names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
 
-
 ppi=300
 jpeg(filename = "./figures/fig06-optionA.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
@@ -316,8 +313,6 @@ ggplot(dataCentric, aes(x=f.cat1, y=f.cat2)) +
 
 
 #### What are the most frequently intended uses within each focus?
-
-
 ggplot(subsetCat2, aes(x=reorder(f.cat2, countCat2), y=countCat2, fill=f.cat1)) +
     geom_bar(stat="identity") + coord_flip() +
     theme_bw(base_family = "Avenir", base_size=10) + 
@@ -364,7 +359,7 @@ ggplot(humanCentric, aes(x=countCat2, y=f.cat2)) +
     scale_x_continuous(breaks=c(seq(0,3,1))) +
     labs(x = "Number of papers") + 
     labs(y = "Intended uses within human-centric category") + 
-    #labs(title = "Data-centric category broken by Focus and Intended Use") +
+    #labs(title = "Human-centric category broken by Focus and Intended Use") +
     #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
     #theme(legend.background=element_blank()) + # Remove overall border of legend
     #theme(legend.key=element_blank()) + # Remove border around each item of legend
@@ -372,8 +367,8 @@ ggplot(humanCentric, aes(x=countCat2, y=f.cat2)) +
 
 dev.off()
 ############ END FINAL FIGURE #################
-names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
 
+names(humanCentric)[names(humanCentric)=="Focus"]  <- "f.cat1"
 
 
 ggplot(humanCentric, aes(x=f.cat1, y=f.cat2)) +
@@ -386,17 +381,78 @@ ggplot(humanCentric, aes(x=f.cat1, y=f.cat2)) +
     theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) + # Rotating the text 30 degrees
     geom_text(aes(label=countCat2), vjust=0, colour="grey30", size=3)   # Add labels from data
     
-crisisCentric <- subset(subsetCat2,f.cat0=="crisis-centric")
 
-ggplot(crisisCentric, aes(x=f.cat1, y=f.cat2)) +
+applicationCentric <- subset(subsetCat2,f.cat0=="application-centric")
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
+cat2order <- applicationCentric$f.cat2[order(applicationCentric$f.cat1, applicationCentric$countCat2)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+applicationCentric$f.cat2 <- factor(applicationCentric$f.cat2, levels=cat2order)
+
+# A trick to change legend title is to rename the column in the dataframe
+names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
+
+############ FINAL FIGURE #################
+ppi=300
+jpeg(filename = "./figures/fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
+
+ggplot(applicationCentric, aes(x=countCat2, y=f.cat2)) +    
+    geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
+    geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_x_continuous(breaks=c(seq(0,4,1))) +
+    labs(x = "Number of papers") + 
+    labs(y = "Intended uses within application-centric category") + 
+    #labs(title = "Application-centric category broken by Focus and Intended Use") +
+    theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    theme(legend.background=element_blank()) + # Remove overall border of legend
+    #theme(legend.key=element_blank()) + # Remove border around each item of legend
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
+############ END FINAL FIGURE #################
+
+names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
+
+ggplot(applicationCentric, aes(x=f.cat1, y=f.cat2)) +
     geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
     theme_bw(base_family = "Avenir", base_size=10) +
     scale_size_area(max_size=15, guide=FALSE) +
     labs(x = "Focus (fcat1)") + 
     labs(y = "Intended uses (fcat2)") +
-    labs(title = "Crisis-centric category broken by Focus and Intended Use") +
+    labs(title = "Appplication-centric category broken by Focus and Intended Use") +
     theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) + # Rotating the text 30 degrees
     geom_text(aes(label=countCat2), vjust=0, colour="grey30", size=3)   # Add labels from data
+
+
+
+#### Summary: distribution of intended uses over time
+## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
+## to sum the ocurrences  of f.cat2 within each group
+subsetCat3 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2", "p.year"), summarise, 
+                    countCat3 = length(f.cat2))
+
+cat2order <- subsetCat3$f.cat2[order(subsetCat3$f.cat1, subsetCat3$countCat3)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
+
+############ FINAL FIGURE #################
+ppi=300
+jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=8*ppi, res=ppi, quality=100)
+ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
+    geom_point(aes(size=countCat3)) + scale_size_continuous(range=c(1,6)) +
+    theme_bw(base_family = "Avenir", base_size=10) + 
+    #coord_flip() +
+    scale_size_area(max_size=10) +   # scale size
+    labs(colour="Category", size="Count") +
+    labs(x = "Year of publication") + 
+    labs(y = "Intended uses") + 
+    #labs(title = "Intended uses over time") +
+    geom_text(aes(label=countCat3), vjust=-0.1, colour="grey30", size=2)   # Add labels from data
+    
+dev.off()
+############ END FINAL FIGURE #################
+
 
 
 #################

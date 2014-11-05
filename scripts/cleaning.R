@@ -4,8 +4,6 @@
 # 
 #
 
-require(plyr)
-
 workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
 
