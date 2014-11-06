@@ -347,6 +347,7 @@ humanCentric$f.cat2 <- factor(humanCentric$f.cat2, levels=cat2order)
 # A trick to change legend title is to rename the column in the dataframe
 names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 
+
 ############ FINAL FIGURE #################
 ppi=300
 jpeg(filename = "./figures/fig07.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
