@@ -5,7 +5,7 @@
 
 library(ggplot2)## ggplot
 library(plyr)   ## ddply
-library(xtable)
+library(xtable)  ## not required...it generates tables in latex format from data frames
 
 workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
@@ -360,6 +360,7 @@ ggplot(humanCentric, aes(x=countCat2, y=f.cat2)) +
     labs(x = "Number of papers") + 
     labs(y = "Intended uses within human-centric category") + 
     #labs(title = "Human-centric category broken by Focus and Intended Use") +
+    guides(fill=guide_legend(title="Focus")) +  # Set the legend title
     #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
     #theme(legend.background=element_blank()) + # Remove overall border of legend
     #theme(legend.key=element_blank()) + # Remove border around each item of legend
@@ -427,11 +428,12 @@ ggplot(applicationCentric, aes(x=f.cat1, y=f.cat2)) +
 
 
 #### Summary: distribution of intended uses over time
-## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
+## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2, p.year) 
 ## to sum the ocurrences  of f.cat2 within each group
 subsetCat3 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2", "p.year"), summarise, 
                     countCat3 = length(f.cat2))
 
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count
 cat2order <- subsetCat3$f.cat2[order(subsetCat3$f.cat1, subsetCat3$countCat3)]
 # Turn f.cat2 into a factor, with levels in the order of cat2order
 subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
@@ -440,11 +442,11 @@ subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
 ppi=300
 jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=8*ppi, res=ppi, quality=100)
 ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
-    geom_point(aes(size=countCat3)) + scale_size_continuous(range=c(1,6)) +
+    geom_point(aes(size=countCat3)) + 
+    scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
     theme_bw(base_family = "Avenir", base_size=10) + 
-    #coord_flip() +
-    scale_size_area(max_size=10) +   # scale size
-    labs(colour="Category", size="Count") +
+    scale_size_area(max_size=10) +   # scale dots to make them bigger
+    labs(colour="Category", size="Number of\n papers") +
     labs(x = "Year of publication") + 
     labs(y = "Intended uses") + 
     #labs(title = "Intended uses over time") +
