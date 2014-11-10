@@ -203,8 +203,8 @@ ppi=300
 jpeg(filename = "./figures/fig04.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
-ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0)) +
-    geom_bar(stat="identity", width=0.6, colour="black", fill="lightblue") + 
+ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
+    geom_bar(stat="identity", width=0.6, colour="black") + 
     #coord_flip() +
     theme_bw(base_family = "Times", base_size=10) + 
     geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
@@ -212,6 +212,7 @@ ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0)) +
     labs(x = "Main categories") + 
     labs(y = "Number of papers") + 
     #labs(title = "Number of papers by main categories") +
+    scale_colour_brewer(palette="Set1") +
     theme(legend.position="none") + # remove legend
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
@@ -269,6 +270,33 @@ names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
 ppi=300
 jpeg(filename = "./figures/fig06.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
+ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+    geom_bar(stat="identity", width=0.7, colour="black") + 
+    coord_flip() +
+    #geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
+    #geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_y_continuous(breaks=c(seq(0,15,1))) +
+    labs(y = "Number of papers") + 
+    labs(x = "Intended uses within data-centric category") + 
+    #labs(title = "Data-centric category broken by Focus and Intended Use") +
+    geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+    theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
+    theme(legend.background=element_blank()) + # Remove overall border of legend
+    #theme(legend.key=element_blank()) + # Remove border around each item of legend
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
+############ END FINAL FIGURE #################
+names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
+
+# A trick to change legend title is to rename the column in the dataframe
+names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
+
+ppi=300
+jpeg(filename = "./figures/fig06-dots.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+
 ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
     geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
@@ -284,8 +312,8 @@ ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +
     theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
 dev.off()
-############ END FINAL FIGURE #################
 names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
+
 
 ppi=300
 jpeg(filename = "./figures/fig06-optionA.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
