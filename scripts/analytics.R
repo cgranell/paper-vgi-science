@@ -24,7 +24,7 @@ load(pathToDataFile)
 summary(data)
 
 # number of representative papers 
-numPapers <- length(unique(data$p.id))  # 57
+numPapers <- length(unique(data$p.id))  # 58
 
 
 ######################################################
@@ -92,7 +92,7 @@ subsetVenues0 <- ddply(subsetVenues, c("p.venue", "p.venuetype"), summarise,
            countVenue  = as.integer(table(p.venue)))
 
 
-# Journal and conference rates. Note that total is 56 because one paper is a technical report
+# Journal and conference rates. Note that total is 57 because one paper is a technical report
 sumJournals <- sum(subsetVenues0[subsetVenues0$p.venuetype=="journal", c("countVenue")])
 sumConferences <- sum(subsetVenues0[subsetVenues0$p.venuetype=="conference", c("countVenue")])
 rateJournals <- (sumJournals / (sumJournals + sumConferences))
@@ -224,16 +224,21 @@ dev.off()
 subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
                         countCat1 = length(f.cat1))
 
+# Get the sub-category (f.cat1), sorted first by category (f.cat0), then by count  
+cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
+# Turn f.cat1 into a factor, with levels in the order of cat1order
+subsetCat1$f.cat1 <- factor(subsetCat1$f.cat1, levels=cat1order)
 ############ FINAL FIGURE #################
 ppi=300
 jpeg(filename = "./figures/fig05.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 
-ggplot(subsetCat1, aes(x=reorder(f.cat1, f.cat0), y=countCat1, fill=f.cat0)) +
+ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
     geom_bar(stat="identity", width=0.7, colour="black") + 
     coord_flip() +
     theme_bw(base_family = "Times", base_size=10) + 
     theme(panel.grid.major.y = element_blank()) +
-    scale_fill_brewer("clarity") +
+    scale_colour_brewer(palette="Set1") +
+    #scale_fill_brewer("clarity") +
     geom_text(aes(label=countCat1), hjust=1.5, colour="black", size=3) +
     scale_y_continuous(breaks=c(seq(0,30,5))) +
     labs(x = "Sub-category / focus") + 

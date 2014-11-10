@@ -19,7 +19,7 @@ if (!file.exists(pathToRawFile)) {
 # load raw data
 data <- read.csv(pathToRawFile, colClasses="character", header=TRUE, strip.white=TRUE)
 
-dim(data) # 92 obs. of 29 variables
+dim(data) # 93 obs. of 29 variables
 
 # convert columns names into lowercase  
 names(data) <- tolower(names(data))
@@ -43,6 +43,15 @@ data$f.user <- as.factor(data$f.user)
 data$d.source <- as.factor(data$d.source)
 
 
+
+# "crisis-centric level of f.cat0 is renamed as "applicatin-centric" level
+levels(data$f.cat0)[levels(data$f.cat0)=="crisis-centric"] <- "application-centric"
+
+# We group some sub-categories (f.cat1) which are quite similar. This will ease readiness:
+# "data quality" and "data assessment" are integrated into a new "data quality and assessment" level
+levels(data$f.cat1)[levels(data$f.cat1)=="data quality"] <- "data quality and assessment"
+levels(data$f.cat1)[levels(data$f.cat1)=="data assessment"] <- "data quality and assessment"
+
 # We group some intended uses (f.cat2) which are quite similar. This will ease readiness:
 # "topic classification" and "topic selection" are integrated into 
 # the existing "topic selection and classification" 
@@ -62,7 +71,7 @@ levels(data$f.cat2)[levels(data$f.cat2)=="credible information"] <- "actionable 
 levels(data$f.cat2)[levels(data$f.cat2)=="commuting behabiours"] <- "commuting behaviours"
 
 # number of representative papers 
-length(unique(data$p.id))  # 57
+length(unique(data$p.id))  # 58
 
 # Save data frame object into a local file 
 save(data, file=paste("./data/", dataFile, sep=""))
