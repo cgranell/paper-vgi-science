@@ -43,9 +43,16 @@ data$f.user <- as.factor(data$f.user)
 data$d.source <- as.factor(data$d.source)
 
 
-
 # "crisis-centric level of f.cat0 is renamed as "applicatin-centric" level
 levels(data$f.cat0)[levels(data$f.cat0)=="crisis-centric"] <- "application-centric"
+
+# Names of subcategories within "application-centric" are shorthen  
+levels(data$f.cat1)[levels(data$f.cat1)=="crisis management (coordination and organization)"] <- "coordination and organization"
+levels(data$f.cat1)[levels(data$f.cat1)=="crisis management (detection and prediction)"] <- "detection and prediction"
+levels(data$f.cat1)[levels(data$f.cat1)=="crisis management (health)"] <- "health"
+levels(data$f.cat1)[levels(data$f.cat1)=="crisis management (monitoring)"] <- "monitoring"
+levels(data$f.cat1)[levels(data$f.cat1)=="crisis management (recovery and response)"] <- "recovery and response"
+
 
 # We group some sub-categories (f.cat1) which are quite similar. This will ease readiness:
 # "data quality" and "data assessment" are integrated into a new "data quality and assessment" level

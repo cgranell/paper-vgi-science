@@ -273,8 +273,6 @@ jpeg(filename = "./figures/fig06.jpg",width=9*ppi, height=5*ppi, res=ppi, qualit
 ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.7, colour="black") + 
     coord_flip() +
-    #geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
-    #geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
     theme_bw(base_family = "Avenir", base_size=10) +
     scale_colour_brewer(palette="Set1") +
     scale_y_continuous(breaks=c(seq(0,15,1))) +
@@ -380,10 +378,37 @@ humanCentric$f.cat2 <- factor(humanCentric$f.cat2, levels=cat2order)
 # A trick to change legend title is to rename the column in the dataframe
 names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 
-
 ############ FINAL FIGURE #################
 ppi=300
 jpeg(filename = "./figures/fig07.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
+
+    
+ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+    geom_bar(stat="identity", width=0.7, colour="black") +
+    coord_flip() +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_y_continuous(breaks=c(seq(0,3,1))) +
+    labs(y = "Number of papers") + 
+    labs(x = "Intended uses within human-centric category") + 
+    #labs(title = "Human-centric category broken by Focus and Intended Use") +
+    geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+    guides(fill=guide_legend(title="Focus")) +  # Set the legend title
+    #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    #theme(legend.background=element_blank()) + # Remove overall border of legend
+    #theme(legend.key=element_blank()) + # Remove border around each item of legend
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
+############ END FINAL FIGURE #################
+names(humanCentric)[names(humanCentric)=="Focus"]  <- "f.cat1"
+
+
+# A trick to change legend title is to rename the column in the dataframe
+names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
+
+ppi=300
+jpeg(filename = "./figures/fig07-dots.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(humanCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
@@ -401,9 +426,8 @@ ggplot(humanCentric, aes(x=countCat2, y=f.cat2)) +
     theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
 dev.off()
-############ END FINAL FIGURE #################
-
 names(humanCentric)[names(humanCentric)=="Focus"]  <- "f.cat1"
+
 
 
 ggplot(humanCentric, aes(x=f.cat1, y=f.cat2)) +
@@ -430,6 +454,31 @@ names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
 ppi=300
 jpeg(filename = "./figures/fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 
+ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+    geom_bar(stat="identity", width=0.7, colour="black") +
+    coord_flip() +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_y_continuous(breaks=c(seq(0,4,1))) +
+    labs(y = "Number of papers") + 
+    labs(x = "Intended uses within application-centric category") + 
+    #labs(title = "Application-centric category broken by Focus and Intended Use") +
+    geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+    #theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    #theme(legend.background=element_blank()) + # Remove overall border of legend
+    #theme(legend.key=element_blank()) + # Remove border around each item of legend
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+dev.off()
+############ END FINAL FIGURE #################
+names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
+
+
+# A trick to change legend title is to rename the column in the dataframe
+names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
+
+ppi=300
+jpeg(filename = "./figures/fig08-dots.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 ggplot(applicationCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
     geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
@@ -444,10 +493,14 @@ ggplot(applicationCentric, aes(x=countCat2, y=f.cat2)) +
     #theme(legend.key=element_blank()) + # Remove border around each item of legend
     theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
-dev.off()
-############ END FINAL FIGURE #################
-
 names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
+
+
+
+
+
+
+
 
 ggplot(applicationCentric, aes(x=f.cat1, y=f.cat2)) +
     geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
@@ -488,6 +541,64 @@ ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
     
 dev.off()
 ############ END FINAL FIGURE #################
+
+
+#################
+## What about the distribution of end users? How are they related to intended uses
+## What about the specification of user case scenarios related to intended uses
+
+## Notes on the variables:
+## f.uc0: Factor(natural harzards, man-made events), it groups the overall use case of the paper into main categories
+## f.uc1: Character, it describes the overall use case of the paper
+## f.user: Factor(several levels), it describes the stakeholders or end users targeted in the paper
+#################
+
+###########################################################
+#                       ONGOING
+###########################################################
+
+treatment <- factor(rep(c(1, 2), c(43, 41)), levels = c(1, 2),
+                    labels = c("placebo", "treated"))
+improved <- factor(rep(c(1, 2, 3, 1, 2, 3), c(29, 7, 7, 13, 7, 21)),
+                   levels = c(1, 2, 3),
+                   labels = c("none", "some", "marked"))
+
+# The widths of the columns is proportional to the number of samples in each of the corresponding age categories
+spineplot(improved, treatment)
+
+subsetUseCases <- data[,c("f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1", "p.year")]
+
+#### What are the distribution of use cases along the main categories?
+## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
+subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise, 
+                    countCat0  = length(f.cat0), 
+                    pct = countCat0 / sum(countCat0))
+
+
+############ FINAL FIGURE #################
+ppi=300
+jpeg(filename = "./figures/fig04-uc.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
+
+## graph of counts, reorder to show counts of "f.cat0" in order
+ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
+    geom_bar(stat="identity", width=0.6, colour="black") + 
+    #coord_flip() +
+    theme_bw(base_family = "Times", base_size=10) + 
+    #geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
+    #scale_y_continuous(breaks=c(seq(0,60,5))) +
+    labs(x = "Main categories") + 
+    labs(y = "Number of papers") + 
+    #labs(title = "Number of papers by main categories") +
+    scale_colour_brewer(palette="Set1") +
+    # theme(legend.position="none") + # remove legend
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
+dev.off()
+############ END FINAL FIGURE #################
+
+
+
+
 
 
 
