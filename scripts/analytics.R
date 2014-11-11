@@ -496,12 +496,6 @@ ggplot(applicationCentric, aes(x=countCat2, y=f.cat2)) +
 names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
 
 
-
-
-
-
-
-
 ggplot(applicationCentric, aes(x=f.cat1, y=f.cat2)) +
     geom_point(aes(size=countCat2), shape=21, colour="black", fill="grey90") +
     theme_bw(base_family = "Avenir", base_size=10) +
