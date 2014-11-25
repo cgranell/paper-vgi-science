@@ -99,7 +99,7 @@ rateJournals <- (sumJournals / (sumJournals + sumConferences))
 rateConferences <- (sumConferences / (sumJournals + sumConferences))
 
 # Legend labels including  percent
-legend.txt = c(paste0("Journal: ", percent(rateJournals)), paste0("Conference: ", percent(rateConferences)))
+legend.txt = c(paste0("Conference: ", percent(rateConferences)), paste0("Journal: ", percent(rateJournals)))
 
 # Get the publication venues (p.venue), sorted first by type, then by count  
 pubsorder <- subsetVenues0$p.venue[order(subsetVenues0$p.venuetype, subsetVenues0$countVenue)]
@@ -109,10 +109,10 @@ subsetVenues0$p.venue <- factor(subsetVenues0$p.venue, levels=pubsorder)
 
 ############ FINAL FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig0X-publications.jpg",width=9*ppi, height=9*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig01-publications.jpg",width=9*ppi, height=9*ppi, res=ppi, quality=100)
 
 ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
-    geom_bar(stat="identity", width=0.6, colour="black") + 
+    geom_bar(stat="identity", width=0.6, colour="black") +
     coord_flip() + 
     theme_bw(base_family = "Times", base_size=10) + 
     scale_fill_brewer(palette="Set2") +
