@@ -564,10 +564,9 @@ subsetUseCases <- data[,c("f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1", "p.year
 
 #### What are the distribution of use cases along the main categories?
 ## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
-subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise, 
+subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0", "f.uc1"), summarise, 
                     countCat0  = length(f.cat0), 
                     pct = countCat0 / sum(countCat0))
-
 
 ############ FINAL FIGURE #################
 ppi=300
