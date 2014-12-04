@@ -203,7 +203,7 @@ subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise,
                     countCat0  = length(f.cat0))
 
 ############ FINAL FIGURE #################
-ppi=300
+ppi=600
 jpeg(filename = "./figures/fig05.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
@@ -234,7 +234,7 @@ cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
 # Turn f.cat1 into a factor, with levels in the order of cat1order
 subsetCat1$f.cat1 <- factor(subsetCat1$f.cat1, levels=cat1order)
 ############ FINAL FIGURE #################
-ppi=300
+ppi=600
 jpeg(filename = "./figures/fig06.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
@@ -248,7 +248,9 @@ ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
     scale_y_continuous(breaks=c(seq(0,30,5))) +
     labs(x = "Sub-category / focus") + 
     labs(y = "Number of papers") +
-    guides(fill=guide_legend(title="Main categories"))  # Set the legend title
+    guides(fill=guide_legend(title="Main categories")) +  # Set the legend title
+    theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    theme(legend.background=element_blank()) # Remove overall border of legend
     #labs(title = "Number of paper by focus (fcat1) and categories (fcat0)") +
 dev.off()    
 
@@ -271,7 +273,7 @@ dataCentric$f.cat2 <- factor(dataCentric$f.cat2, levels=cat2order)
 names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
 
 ############ FINAL FIGURE #################
-ppi=300
+ppi=600
 jpeg(filename = "./figures/fig07.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
@@ -383,7 +385,7 @@ humanCentric$f.cat2 <- factor(humanCentric$f.cat2, levels=cat2order)
 names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 
 ############ FINAL FIGURE #################
-ppi=300
+ppi=600
 jpeg(filename = "./figures/fig08.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
 
     
@@ -455,8 +457,8 @@ applicationCentric$f.cat2 <- factor(applicationCentric$f.cat2, levels=cat2order)
 names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
 
 ############ FINAL FIGURE #################
-ppi=300
-jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
+ppi=600
+jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=4*ppi, res=ppi, quality=100)
 
 ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.7, colour="black") +
