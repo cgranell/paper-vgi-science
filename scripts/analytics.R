@@ -59,15 +59,19 @@ getUniqueSources <- function() {
     
     sources <- data.frame(
         p.id=character(numPapers), 
+        f.cat0=character(numPapers),
+        f.cat1=character(numPapers),
         d.source=character(numPapers),
         d.official=character(numPapers),
         stringsAsFactors=FALSE)
     
     
     for (i in 1:numPapers) {
-        firstSource <- sapply(data[data$p.id==papers[i], c("d.source", "d.official")], function(d) {d[1]})        
+        firstSource <- sapply(data[data$p.id==papers[i], c("f.cat0", "f.cat1", "f.uc0", "d.source", "d.official")], function(d) {d[1]})        
         # Add a new row (paper id + first ocurrence of source) to the data.frame
         sources [i, ] <- c(papers[i],
+                           as.character(firstSource[c("f.cat0")]), 
+                           as.character(firstSource[c("f.cat1")]), 
                            as.character(firstSource[c("d.source")]), 
                            as.character(firstSource[c("d.official")]))   
     }
@@ -80,7 +84,7 @@ percent <- function(x, digits = 2, format = "f", ...) {
 }
 
 #################
-###  RQ5: Publication venues
+###  Distribution of publication venues
 #### What are the publication venues VGI research & data science have been published in? 
 #### What are the most popular venues (> 1 occurrence)?
 #################
@@ -108,7 +112,7 @@ subsetVenues0$p.venue <- factor(subsetVenues0$p.venue, levels=pubsorder)
 
 
 ############ FINAL FIGURE #################
-ppi=300
+ppi=600
 jpeg(filename = "./figures/fig01-publications.jpg",width=9*ppi, height=9*ppi, res=ppi, quality=100)
 
 ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
@@ -118,7 +122,7 @@ ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
     scale_fill_brewer(palette="Set2") +
     scale_y_continuous(breaks=c(seq(0,6,1))) +
     labs(x = "Publication venues") + 
-    labs(y = "Counts of venue") + 
+    labs(y = "Number of papers") + 
     #labs(title = "Counts of venues by type") + 
     labs(fill="Venue type") +   # set the legend title
     theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
@@ -156,7 +160,7 @@ subsetSources <- getUniqueSources()
 
 #### What are the most frequently VGI data sources? 
 ## Run the function table() on the value of "d.source" for each group (d.source, d.official)
-subsetSources0 <- ddply(subsetSources, c("d.source"), summarise, 
+subsetSources0 <- ddply(subsetSources, c("f.cat0", "f.cat1", "d.source"), summarise, 
                        countSource  = as.integer(table(d.source)))
 
 ## graph of counts, reorder to show counts of "d.source" in order
@@ -200,7 +204,7 @@ subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise,
 
 ############ FINAL FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig04.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig05.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
@@ -231,7 +235,7 @@ cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
 subsetCat1$f.cat1 <- factor(subsetCat1$f.cat1, levels=cat1order)
 ############ FINAL FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig05.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig06.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
     geom_bar(stat="identity", width=0.7, colour="black") + 
@@ -268,7 +272,7 @@ names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
 
 ############ FINAL FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig06.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig07.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.7, colour="black") + 
@@ -293,7 +297,7 @@ names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
 names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
 
 ppi=300
-jpeg(filename = "./figures/fig06-dots.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig07-dots.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
@@ -314,7 +318,7 @@ names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
 
 
 ppi=300
-jpeg(filename = "./figures/fig06-optionA.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig07-optionA.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## We use a dot plot faceted by focus (f.cat1)
 ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
@@ -380,7 +384,7 @@ names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 
 ############ FINAL FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig07.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig08.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
 
     
 ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
@@ -408,7 +412,7 @@ names(humanCentric)[names(humanCentric)=="Focus"]  <- "f.cat1"
 names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 
 ppi=300
-jpeg(filename = "./figures/fig07-dots.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig08-dots.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(humanCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
@@ -452,7 +456,7 @@ names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
 
 ############ FINAL FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.7, colour="black") +
@@ -478,7 +482,7 @@ names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
 names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
 
 ppi=300
-jpeg(filename = "./figures/fig08-dots.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig09-dots.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 ggplot(applicationCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
     geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
@@ -521,7 +525,7 @@ subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
 
 ############ FINAL FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=8*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig11.jpg",width=6*ppi, height=8*ppi, res=ppi, quality=100)
 ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
     geom_point(aes(size=countCat3)) + 
     scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
@@ -564,13 +568,13 @@ subsetUseCases <- data[,c("f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1", "p.year
 
 #### What are the distribution of use cases along the main categories?
 ## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
-subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0", "f.uc1"), summarise, 
+subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise, 
                     countCat0  = length(f.cat0), 
                     pct = countCat0 / sum(countCat0))
 
-############ FINAL FIGURE #################
+############ TENTATIVE FIGURE #################
 ppi=300
-jpeg(filename = "./figures/fig04-uc.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig05-uc.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
@@ -587,8 +591,16 @@ ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
 dev.off()
-############ END FINAL FIGURE #################
+############ END TENTATIVE FIGURE #################
 
+
+subsetUsers <- data[,c("f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1", "f.user", "p.year")]
+
+#### What are the distribution of use cases along the main categories?
+## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
+subsetUsers0 <- ddply(subsetUsers, c("f.cat0", "f.uc0", "f.user"), summarise, 
+                         countCat0  = length(f.cat0), 
+                         pct = countCat0 / sum(countCat0))
 
 
 
