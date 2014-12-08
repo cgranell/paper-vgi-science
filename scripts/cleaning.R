@@ -77,6 +77,15 @@ levels(data$f.cat2)[levels(data$f.cat2)=="credible information"] <- "actionable 
 # fixed typo: "commuting behabiours" --> "commuting behaviours"
 levels(data$f.cat2)[levels(data$f.cat2)=="commuting behabiours"] <- "commuting behaviours"
 
+
+# We group some sources (d.source) which are quite similar. This will ease readiness:
+levels(data$d.source)[levels(data$d.source)=="Mutiple social media sources"] <- "Multiple sources"
+levels(data$d.source)[levels(data$d.source)=="Mutiple social media sources  (MMS messages; Web portals; blogs; Twitter; Facebook)"] <- "Multiple sources"
+levels(data$d.source)[levels(data$d.source)=="Mutiple social media sources (Flickr; Panoramio; Picasa Web; Geograph)"] <- "Multiple sources"
+
+# Merge "Synthetic cell phone data (simulated data) with "GPS data from mobile phone"
+levels(data$d.source)[levels(data$d.source)=="Synthetic cell phone data"] <- "GPS data from mobile phone"
+
 # number of representative papers 
 length(unique(data$p.id))  # 58
 

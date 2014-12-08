@@ -162,8 +162,12 @@ subsetSources <- getUniqueSources()
 subsetSources0 <- ddply(subsetSources, c("f.cat0", "f.cat1", "d.source"), summarise, 
                        countSource  = as.integer(table(d.source)))
 
+subsetSources0 <- ddply(subsetSources, c("d.source"), summarise, 
+                        countSource  = length(d.source))
+
 # Get the sources  (d.source), sorted first by category (f.cat0), then by count  
 sourceorder <- subsetSources0$d.source[order(subsetSources0$f.cat0, subsetSources0$countSource)]
+sourceorder <- subsetSources0$d.source[order(subsetSources0$countSource)]
 # Turn d.source into a factor, with levels in the order of sourceorder
 subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
 
@@ -177,7 +181,7 @@ levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Synthetic cell
 
 
 ## graph of counts, reorder to show counts of "d.source" in order
-ggplot(subsetSources0, aes(x=d.source, y=countSource) +
+ggplot(subsetSources0, aes(x=d.source, y=countSource, fill=f.cat0)) +
     geom_bar(stat="identity", width=0.6, colour="black") +
     coord_flip() +
     theme_bw(base_family = "Times", base_size=10) + 
@@ -185,10 +189,8 @@ ggplot(subsetSources0, aes(x=d.source, y=countSource) +
     labs(x = "VGI source") + 
     labs(y = "Number of papers") + 
     #labs(title = "Counts of main VGI sources") +
-    geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3)
-    
-    theme(panel.grid.major.y = element_blank(),
-          panel.grid.minor.y = element_blank()) # Hide the horizontal grid lines
+    geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3) +
+    theme(panel.grid.major.y = element_blank()) # Hide the horizontal grid lines
 
 
 
