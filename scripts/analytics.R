@@ -130,8 +130,7 @@ ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
     theme(legend.key=element_blank()) + # Remove border around each item of legend
     scale_fill_discrete(labels=legend.txt) + # Change the legend labels
     geom_text(aes(label=countVenue), hjust=1.5, colour="white", size=2.5) +
-    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
-
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines 
 dev.off()
 ############ END FINAL FIGURE #################
 
@@ -163,16 +162,52 @@ subsetSources <- getUniqueSources()
 subsetSources0 <- ddply(subsetSources, c("f.cat0", "f.cat1", "d.source"), summarise, 
                        countSource  = as.integer(table(d.source)))
 
+# Get the sources  (d.source), sorted first by category (f.cat0), then by count  
+sourceorder <- subsetSources0$d.source[order(subsetSources0$f.cat0, subsetSources0$countSource)]
+# Turn d.source into a factor, with levels in the order of sourceorder
+subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
+
+# Merge similar levels into "Multiple sources"
+levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Mutiple social media sources"] <- "Multiple sources"
+levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Mutiple social media sources  (MMS messages; Web portals; blogs; Twitter; Facebook)"] <- "Multiple sources"
+levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Mutiple social media sources (Flickr; Panoramio; Picasa Web; Geograph)"] <- "Multiple sources"
+
+# Merge "Synthetic cell phone data (simulated data) with "GPS data from mobile phone"
+levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Synthetic cell phone data"] <- "GPS data from mobile phone"
+
+
 ## graph of counts, reorder to show counts of "d.source" in order
-ggplot(subsetSources0, aes(x=reorder(d.source, countSource), y=countSource)) +
-    geom_bar(stat="identity") + coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) + 
-    labs(x = "Source") + 
-    labs(y = "Count") + 
-    labs(title = "Counts of main VGI sources") +
-    geom_text(aes(label=countSource), hjust=1.5, colour="white") +
+ggplot(subsetSources0, aes(x=d.source, y=countSource) +
+    geom_bar(stat="identity", width=0.6, colour="black") +
+    coord_flip() +
+    theme_bw(base_family = "Times", base_size=10) + 
+    scale_colour_brewer(palette="Set1") +
+    labs(x = "VGI source") + 
+    labs(y = "Number of papers") + 
+    #labs(title = "Counts of main VGI sources") +
+    geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3)
+    
     theme(panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank()) # Hide the horizontal grid lines
+
+
+
+ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+    geom_bar(stat="identity", width=0.6, colour="black") +
+    coord_flip() +
+    theme_bw(base_family = "Avenir", base_size=10) +
+    scale_colour_brewer(palette="Set1") +
+    scale_y_continuous(breaks=c(seq(0,3,1))) +
+    labs(y = "Number of papers") + 
+    labs(x = "Intended uses within human-centric category") + 
+    #labs(title = "Human-centric category broken by Focus and Intended Use") +
+    geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+    guides(fill=guide_legend(title="Focus")) +  # Set the legend title
+    #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    #theme(legend.background=element_blank()) + # Remove overall border of legend
+    #theme(legend.key=element_blank()) + # Remove border around each item of legend
+    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
 
 #### What are the most popular sources? 
 ## we must "read" the previous plot accordingly
@@ -204,11 +239,11 @@ subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise,
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig05.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig05a.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
-    geom_bar(stat="identity", width=0.6, colour="black") + 
+    geom_bar(stat="identity", width=0.4, colour="black") + 
     #coord_flip() +
     theme_bw(base_family = "Times", base_size=10) + 
     geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
@@ -235,10 +270,10 @@ cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
 subsetCat1$f.cat1 <- factor(subsetCat1$f.cat1, levels=cat1order)
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig06.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig06.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
-    geom_bar(stat="identity", width=0.7, colour="black") + 
+    geom_bar(stat="identity", width=0.6, colour="black") + 
     coord_flip() +
     theme_bw(base_family = "Times", base_size=10) + 
     theme(panel.grid.major.y = element_blank()) +
@@ -256,6 +291,46 @@ dev.off()
 
 ############ END FINAL FIGURE #################
 
+### Put Figure 5 and use case distribution  side by side
+ppi=600
+jpeg(filename = "./figures/fig05-06.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
+
+plot1<- ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
+        geom_bar(stat="identity", width=0.4, colour="black") + 
+        #coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) + 
+        geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
+        scale_y_continuous(breaks=c(seq(0,60,5))) +
+        labs(x = "Main categories") + 
+        labs(y = "Number of papers") + 
+        #labs(title = "Number of papers by main categories") +
+        scale_colour_brewer(palette="Set1") +
+        theme(legend.position="none") + # remove legend
+        theme(panel.grid.major.x = element_blank(),
+              panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
+plot2<-ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
+    geom_bar(stat="identity", width=0.4, colour="black") + 
+    coord_flip() +
+    theme_bw(base_family = "Times", base_size=10) + 
+    theme(panel.grid.major.y = element_blank()) +
+    scale_colour_brewer(palette="Set1") +
+    #scale_fill_brewer("clarity") +
+    geom_text(aes(label=countCat1), hjust=1.5, colour="black", size=3) +
+    scale_y_continuous(breaks=c(seq(0,30,5))) +
+    labs(x = "Sub-category / focus") + 
+    labs(y = "Number of papers") +
+    guides(fill=guide_legend(title="Main categories")) +  # Set the legend title
+    theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    theme(legend.background=element_blank()) # Remove overall border of legend
+    #labs(title = "Number of paper by focus (fcat1) and categories (fcat0)") +
+
+
+library(grid)
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(plot1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(plot2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+
+dev.off()    
 #### What are the most frequently intended uses within each focus?
 ## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
 ## to sum the ocurrences  of f.cat2 within each group
@@ -277,9 +352,9 @@ ppi=600
 jpeg(filename = "./figures/fig07.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
-    geom_bar(stat="identity", width=0.7, colour="black") + 
+    geom_bar(stat="identity", width=0.6, colour="black") + 
     coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) +
+    theme_bw(base_family = "Times", base_size=10) +
     scale_colour_brewer(palette="Set1") +
     scale_y_continuous(breaks=c(seq(0,15,1))) +
     labs(y = "Number of papers") + 
@@ -304,7 +379,7 @@ jpeg(filename = "./figures/fig07-dots.jpg",width=9*ppi, height=5*ppi, res=ppi, q
 ggplot(dataCentric, aes(x=countCat2, y=f.cat2)) +    
     geom_point(size=3, aes(colour=Focus)) +    # Use a larger dot
     geom_segment(aes(yend=f.cat2), xend=0, colour="grey50") +
-    theme_bw(base_family = "Avenir", base_size=10) +
+    theme_bw(base_family = "Times", base_size=10) +
     scale_colour_brewer(palette="Set1") +
     scale_x_continuous(breaks=c(seq(0,15,1))) +
     labs(x = "Number of papers") + 
@@ -386,13 +461,13 @@ names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig08.jpg",width=7*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 
     
 ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
-    geom_bar(stat="identity", width=0.7, colour="black") +
+    geom_bar(stat="identity", width=0.6, colour="black") +
     coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) +
+    theme_bw(base_family = "Times", base_size=10) +
     scale_colour_brewer(palette="Set1") +
     scale_y_continuous(breaks=c(seq(0,3,1))) +
     labs(y = "Number of papers") + 
@@ -461,9 +536,9 @@ ppi=600
 jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=4*ppi, res=ppi, quality=100)
 
 ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
-    geom_bar(stat="identity", width=0.7, colour="black") +
+    geom_bar(stat="identity", width=0.6, colour="black") +
     coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) +
+    theme_bw(base_family = "Times", base_size=10) +
     scale_colour_brewer(palette="Set1") +
     scale_y_continuous(breaks=c(seq(0,4,1))) +
     labs(y = "Number of papers") + 
@@ -526,12 +601,12 @@ cat2order <- subsetCat3$f.cat2[order(subsetCat3$f.cat1, subsetCat3$countCat3)]
 subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
 
 ############ FINAL FIGURE #################
-ppi=300
+ppi=600
 jpeg(filename = "./figures/fig11.jpg",width=6*ppi, height=8*ppi, res=ppi, quality=100)
 ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
     geom_point(aes(size=countCat3)) + 
     scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
-    theme_bw(base_family = "Avenir", base_size=10) + 
+    theme_bw(base_family = "Times", base_size=10) + 
     scale_size_area(max_size=10) +   # scale dots to make them bigger
     labs(colour="Category", size="Number of\n papers") +
     labs(x = "Year of publication") + 
@@ -574,13 +649,21 @@ subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise,
                     countCat0  = length(f.cat0), 
                     pct = countCat0 / sum(countCat0))
 
+levels(subsetUseCases0$f.uc0)[levels(subsetUseCases0$f.uc0)=="natural harzards and man-made events"] <- "natural harzards and\n man-made events"
+
+# Turn NA as a factor level
+subsetUseCases0$f.uc0 <- addNA(subsetUseCases0$f.uc0)
+# Rename level of a factor by index: change fourh item, NA, to "Unknown".
+levels(subsetUseCases0$f.uc0)[4] <- "Unknown"
+levels(subsetUseCases0$f.uc0)
+
 ############ TENTATIVE FIGURE #################
-ppi=300
-jpeg(filename = "./figures/fig05-uc.jpg",width=5*ppi, height=5*ppi, res=ppi, quality=100)
+ppi=600
+jpeg(filename = "./figures/fig05b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
-    geom_bar(stat="identity", width=0.6, colour="black") + 
+    geom_bar(stat="identity", width=0.4, colour="black") + 
     #coord_flip() +
     theme_bw(base_family = "Times", base_size=10) + 
     #geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
@@ -588,7 +671,10 @@ ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc
     labs(x = "Main categories") + 
     labs(y = "Number of papers") + 
     #labs(title = "Number of papers by main categories") +
-    scale_colour_brewer(palette="Set1") +
+    scale_color_brewer(palette="Set2") +
+    labs(fill="Use cases") +   # set the legend title
+    theme(legend.position=c(0,1), legend.justification=c(0,1)) +  # set legend position inside graphic, tpo-left position    
+    theme(legend.background=element_blank()) + # Remove overall border of legend
     # theme(legend.position="none") + # remove legend
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
