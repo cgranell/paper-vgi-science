@@ -162,7 +162,7 @@ subsetSources <- getUniqueSources()
 subsetSources0 <- ddply(subsetSources, c("f.cat0", "f.cat1", "d.source"), summarise, 
                        countSource  = as.integer(table(d.source)))
 
-subsetSources0 <- ddply(subsetSources, c("d.source"), summarise, 
+subsetSources0 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
                         countSource  = length(d.source))
 
 # Get the sources  (d.source), sorted first by category (f.cat0), then by count  
@@ -171,45 +171,25 @@ sourceorder <- subsetSources0$d.source[order(subsetSources0$countSource)]
 # Turn d.source into a factor, with levels in the order of sourceorder
 subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
 
-# Merge similar levels into "Multiple sources"
-levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Mutiple social media sources"] <- "Multiple sources"
-levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Mutiple social media sources  (MMS messages; Web portals; blogs; Twitter; Facebook)"] <- "Multiple sources"
-levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Mutiple social media sources (Flickr; Panoramio; Picasa Web; Geograph)"] <- "Multiple sources"
-
-# Merge "Synthetic cell phone data (simulated data) with "GPS data from mobile phone"
-levels(subsetSources0$d.source)[levels(subsetSources0$d.source)=="Synthetic cell phone data"] <- "GPS data from mobile phone"
-
-
+############ FINAL FIGURE #################
+ppi=600
+jpeg(filename = "./figures/fig10.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 ## graph of counts, reorder to show counts of "d.source" in order
 ggplot(subsetSources0, aes(x=d.source, y=countSource, fill=f.cat0)) +
     geom_bar(stat="identity", width=0.6, colour="black") +
     coord_flip() +
     theme_bw(base_family = "Times", base_size=10) + 
     scale_colour_brewer(palette="Set1") +
+    scale_y_continuous(breaks=c(seq(0,28,2))) +
     labs(x = "VGI source") + 
     labs(y = "Number of papers") + 
     #labs(title = "Counts of main VGI sources") +
-    geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3) +
+    #geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3) +
+    guides(fill=guide_legend(title="Category")) +  # Set the legend title
+    theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
     theme(panel.grid.major.y = element_blank()) # Hide the horizontal grid lines
-
-
-
-ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
-    geom_bar(stat="identity", width=0.6, colour="black") +
-    coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) +
-    scale_colour_brewer(palette="Set1") +
-    scale_y_continuous(breaks=c(seq(0,3,1))) +
-    labs(y = "Number of papers") + 
-    labs(x = "Intended uses within human-centric category") + 
-    #labs(title = "Human-centric category broken by Focus and Intended Use") +
-    geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
-    guides(fill=guide_legend(title="Focus")) +  # Set the legend title
-    #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
-    #theme(legend.background=element_blank()) + # Remove overall border of legend
-    #theme(legend.key=element_blank()) + # Remove border around each item of legend
-    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
-
+dev.off()
+############ END FINAL FIGURE #################
 
 #### What are the most popular sources? 
 ## we must "read" the previous plot accordingly
