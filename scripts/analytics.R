@@ -171,6 +171,13 @@ sourceorder <- subsetSources0$d.source[order(subsetSources0$countSource)]
 # Turn d.source into a factor, with levels in the order of sourceorder
 subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
 
+
+# Turn NA as a factor level
+subsetSources0$d.source <- addNA(subsetSources0$d.source)
+# Rename level of a factor by index: change fourh item, NA, to "Unknown".
+levels(subsetSources0$d.source)[19] <- "Unknown"
+levels(subsetSources0$d.source)
+
 ############ FINAL FIGURE #################
 ppi=600
 jpeg(filename = "./figures/fig10.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
