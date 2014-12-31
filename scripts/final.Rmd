@@ -1,22 +1,157 @@
 ---
-title: "Data analisis for final figures"
+title: "VGI papers analysis for creating final figures included in submitted paper"
 author: "Carlos Granell"
 date: "Wednesday, December 31, 2014"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Synopsis
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## Loading data
+
+```{r global_options, include=FALSE}
+##  Packages required for the analysis 
+suppressWarnings(require(plyr))
+suppressWarnings(require(ggplot2))
+suppressWarnings(require(gridExtra))  # grid.arrange
+suppressWarnings(require(knitr))
+
+opts_chunk$set(fig.width=12, fig.height=8, echo=FALSE, warning=FALSE, message=FALSE)
+
+#  Print in digits rather than scientific notation
+options("scipen"=100, "digits"=0)
+```
+
+```{r loading_data}
+setwd("C:/Users/cgranell/Dropbox/Data/MyCode/paper-vgi-science/")
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/reviewData.rda"
+dataFile <- "reviewData.rda"
+pathToDataFile <- paste("./data/", dataFile, sep="")
+
+if (!file.exists(pathToDataFile)) {
+    file <- download.file(url, destfile=pathToDataFile)
+}
+
+load(pathToDataFile)
+```
+
+## Preprocessing scripts 
 
 ```{r}
-summary(cars)
+getUniqueVenues <- function() {
+    papers <- unique(data$p.id)
+    numPapers = length(papers)
+    
+    venues <- data.frame(
+        p.id=character(numPapers), 
+        p.venue=character(numPapers),
+        p.venuetype=character(numPapers),
+        stringsAsFactors=FALSE)
+        
+    
+    for (i in 1:numPapers) {
+        firstVenue <- sapply(data[data$p.id==papers[i], c("p.venue", "p.venuetype")], function(d) {d[1]})        
+        # Add a new row (paper id + first ocurrence of venue) to the data.frame
+        venues [i, ] <- c(papers[i], 
+                          as.character(firstVenue[c("p.venue")]), 
+                          as.character(firstVenue[c("p.venuetype")]))   
+    }
+    return (venues)
+}
 ```
 
-You can also embed plots, for example:
-
-```{r, echo=FALSE}
-plot(cars)
+```{r}
+getUniqueSources <- function() {
+    papers <- unique(data$p.id)
+    numPapers = length(papers)
+    
+    sources <- data.frame(
+        p.id=character(numPapers), 
+        f.cat0=character(numPapers),
+        f.cat1=character(numPapers),
+        d.source=character(numPapers),
+        d.official=character(numPapers),
+        stringsAsFactors=FALSE)
+    
+    
+    for (i in 1:numPapers) {
+        firstSource <- sapply(data[data$p.id==papers[i], c("f.cat0", "f.cat1", "f.uc0", "d.source", "d.official")], function(d) {d[1]})        
+        # Add a new row (paper id + first ocurrence of source) to the data.frame
+        sources [i, ] <- c(papers[i],
+                           as.character(firstSource[c("f.cat0")]), 
+                           as.character(firstSource[c("f.cat1")]), 
+                           as.character(firstSource[c("d.source")]), 
+                           as.character(firstSource[c("d.official")]))   
+    }
+    return (sources)
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+percent <- function(x, digits = 2, format = "f", ...) {
+    paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+}
+```
+
+
+## Results: Final figures  
+R scripts below describe how the data were processed for creating figures included in the submitted paper.
+
+### Distribution of publication venues
+What are the publication venues VGI research & data science have been published in? 
+
+```{r}
+# get thge list of unique venues
+subsetVenues <- getUniqueVenues()
+
+# Run the function table() on the value of "p.venue" for each group (p.venue, p.venuetype)
+subsetVenues0 <- ddply(subsetVenues, c("p.venue", "p.venuetype"), summarise, 
+           countVenue  = as.integer(table(p.venue)))
+
+# Journal and conference rates. Note that total is 57 because one paper is a technical report
+sumJournals <- sum(subsetVenues0[subsetVenues0$p.venuetype=="journal", c("countVenue")])
+sumConferences <- sum(subsetVenues0[subsetVenues0$p.venuetype=="conference", c("countVenue")])
+rateJournals <- (sumJournals / (sumJournals + sumConferences))
+rateConferences <- (sumConferences / (sumJournals + sumConferences))
+
+# Legend labels including  percent
+legend.txt = c(paste0("Conference: ", percent(rateConferences)), paste0("Journal: ", percent(rateJournals)))
+
+# Get the publication venues (p.venue), sorted first by type, then by count  
+pubsorder <- subsetVenues0$p.venue[order(subsetVenues0$p.venuetype, subsetVenues0$countVenue)]
+# Turn p.venue into a factor, with levels in the order of pubs2order
+subsetVenues0$p.venue <- factor(subsetVenues0$p.venue, levels=pubsorder)
+```
+
+
+
+```{r, echo=FALSE, }
+##ppi=600
+##jpeg(filename = "./figures/fig01-publications.jpg",width=9*ppi, height=9*ppi, res=ppi, quality=100)
+fig1 <- ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
+        geom_bar(stat="identity", width=0.6, colour="black") +
+        coord_flip() + 
+        theme_bw(base_family = "Times", base_size=10) + 
+        scale_fill_brewer(palette="Set2") +
+        scale_y_continuous(breaks=c(seq(0,6,1))) +
+        labs(x = "Publication venues") + 
+        labs(y = "Number of papers") + 
+        labs(title = "Figure 1: Counts of publication venues by type (conference vs journal)") + 
+        labs(fill="Venue type") +   # set the legend title
+        theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
+        theme(legend.background=element_blank()) + # Remove overall border of legend
+        theme(legend.key=element_blank()) + # Remove border around each item of legend
+        scale_fill_discrete(labels=legend.txt) + # Change the legend labels
+        geom_text(aes(label=countVenue), hjust=1.5, colour="white", size=2.5) +
+        theme(panel.grid.major.y = element_blank()) # No horizontal grid lines 
+
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig1, ncol=1, nrow=1))
+```
+
+
+```{r echo=FALSE}
+#suppressWarnings(knit2html(input = "final.Rmd"))
+```
