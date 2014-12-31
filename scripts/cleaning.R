@@ -4,7 +4,7 @@
 # 
 #
 
-workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
+workingPath <- "C:/Users/cgranell/Dropbox/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
 
 url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/rawData.csv"
