@@ -90,4 +90,4 @@ levels(data$d.source)[levels(data$d.source)=="Synthetic cell phone data"] <- "GP
 length(unique(data$p.id))  # 58
 
 # Save data frame object into a local file 
-save(data, file=paste("./data/", dataFile, sep=""))
+save(data, file=paste("./data/gein/", dataFile, sep=""))
