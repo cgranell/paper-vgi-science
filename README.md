@@ -28,7 +28,11 @@ Q3. What would be one specific aspect that you consider missing or under-represe
 
 Q4. Does VGI have a potential to impact governance?
 
-## Folder organization
+## Results
+
+We analysed a list of scientific documents that are hosted in the `papers` folder. by reviewing these papers, we produced two distinct datasets. Each dataset is the source data for two research works, which results have been submitted to GEIN and TGIS. That's why the data folder is divided into GEIN and TGIS, and scripts names for the TGIS journal have the suffix "tgis". Scripts for the GEIN do not append "gein" to their file names. 
+
+### Folder organization (GEIN)
 
 * Data folder contains: 
 ** the original data file `data.xlxs` we used for taking notes while we conducted the review of papers. This file is not used in the data analysis; 
@@ -41,14 +45,16 @@ Q4. Does VGI have a potential to impact governance?
 
 * scripts folder contains the R scripts used in the exploratory data analysis. 
 
+### Folder organization (TGIS)
+
 ## How to run the scripts
 
 To reproduce all analysis steps:
 
-1. Update the variable `workingPath` in script `cleaning.R` to your local working directory.
-2. Run the script `cleaning.R`, which downloads the required input data and produces the file `reviewData.rda` in your working directory.  
-3. Update the variable `workingPath` in script `analytics.R` to your local working directory.
-4. Run the script `analytics.R` which takes the file in step 2 as input. 
+1. Update the variable `workingPath` in script `cleaning.R` or `cleaning.tgis.R` to your local working directory.
+2. Run the script `cleaning.R` (or `cleaning.tgis.R`() , which downloads the required input data and produces the file `cleandata.rda` in your working directory.  
+3. Update the variable `workingPath` in script `analytics.R` (or `analytics.tgis.R`) to your local working directory.
+4. Run the script `analytics.R` (`analytics-tgis.R`) which takes the file in step 2 as input. 
 
 Alternatively, go straight to step 3 to skip data cleaning step.
 

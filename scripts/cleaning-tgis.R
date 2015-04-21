@@ -1,17 +1,17 @@
 #
 # author: cgranell
-# aim: transformation and cleaning scripts to transform raw data into processed data
+# aim: transformation and cleaning scripts to transform raw data into processed data for the TGIS study
 # 
 #
 
 workingPath <- "C:/Users/cgranell/Dropbox/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
 
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/gein/rawdata.csv"
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/tgis/rawdata.csv"
 rawFile <- "rawdata.csv"
 dataFile <- "cleandata.rda"
 
-pathToRawFile <- paste("./data/gein", rawFile, sep="")
+pathToRawFile <- paste("./data/tgis/", rawFile, sep="")
 if (!file.exists(pathToRawFile)) {
     file <- download.file(url, destfile=pathToRawFile)
 }

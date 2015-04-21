@@ -27,9 +27,9 @@ options("scipen"=100, "digits"=0)
 
 ```{r loading_data}
 setwd("C:/Users/cgranell/Dropbox/Data/MyCode/paper-vgi-science/")
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/reviewData.rda"
-dataFile <- "reviewData.rda"
-pathToDataFile <- paste("./data/", dataFile, sep="")
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/gein/cleandata.rda"
+dataFile <- "cleandata.rda"
+pathToDataFile <- paste("./data/gein/", dataFile, sep="")
 
 if (!file.exists(pathToDataFile)) {
     file <- download.file(url, destfile=pathToDataFile)

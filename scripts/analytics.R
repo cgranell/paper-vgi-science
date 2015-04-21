@@ -10,9 +10,9 @@ library(xtable)  ## not required...it generates tables in latex format from data
 workingPath <- "C:/Users/cgranell/Dropbox/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
 
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/reviewData.rda"
-dataFile <- "reviewData.rda"
-pathToDataFile <- paste("./data/", dataFile, sep="")
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/gein/cleandata.rda"
+dataFile <- "cleandata.rda"
+pathToDataFile <- paste("./data/gein/", dataFile, sep="")
 
 if (!file.exists(pathToDataFile)) {
     file <- download.file(url, destfile=pathToDataFile)
