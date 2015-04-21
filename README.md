@@ -61,9 +61,9 @@ Scripts folder contains the R scripts used in the exploratory data analysis:
 
 To reproduce all analysis steps:
 
-1. Update the variable `workingPath` in script `cleaning.R` or `cleaning.tgis.R` to your local working directory.
-2. Run the script `cleaning.R` (or `cleaning.tgis.R`() , which downloads the required input data and produces the file `cleandata.rda` in your working directory.  
-3. Update the variable `workingPath` in script `analytics.R` (or `analytics.tgis.R`) to your local working directory.
+1. Update the variable `workingPath` in script `cleaning.R` or `cleaning-tgis.R` to your local working directory.
+2. Run the script `cleaning.R` (or `cleaning-tgis.R`) , which downloads the required input data and produces the file `cleandata.rda` in your working directory.  
+3. Update the variable `workingPath` in script `analytics.R` (or `analytics-tgis.R`) to your local working directory.
 4. Run the script `analytics.R` (`analytics-tgis.R`) which takes the file in step 2 as input. 
 
 Alternatively, go straight to step 3 to skip data cleaning step.
