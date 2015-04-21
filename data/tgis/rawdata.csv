@@ -1,4 +1,4 @@
-Id,Paper/Dimension,Data: Reproducible,Data: Replicable,Methods: Reproducible,Methods: Replicable,Stakeholders,Description,Verdict
+Id,Paper,Data.Reproducible,Data.Replicable,Methods.Reproducible,Methods.Replicable,Stakeholders,Description,Verdict
 p82,Damiani 2014 [82] ,N/A,N/A,N/A,Yes,"Citizens and users as beneficiaries, LBS providers and government less so","No data was used, no new algorithms developed, all formulas are fully listed",
 p81,Beecham et al. 2014 [81] ,No,No,No,Yes,"Users of the service, researchers, local government, service providers","Dataset is proprietary, specialized, and not available. Original source code or software not made available; qualitative analysis. Standard methods can be replicated; visual analysis for final conclusions however cannot.",
 p80,Budak et al. 2014 [80] ,No,Yes,No,Yes,Everyone,"Dataset is from Twitter Gardenhose, thus not available anymore. Methods are described sufficiently to replicate them but no source code is included.",

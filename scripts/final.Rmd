@@ -26,7 +26,7 @@ options("scipen"=100, "digits"=0)
 ```
 
 ```{r loading_data}
-setwd("C:/Users/cgranell/Dropbox/Data/MyCode/paper-vgi-science/")
+setwd("C:/Users/cgranell/Data/MyCode/paper-vgi-science/")
 url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/gein/cleandata.rda"
 dataFile <- "cleandata.rda"
 pathToDataFile <- paste("./data/gein/", dataFile, sep="")
