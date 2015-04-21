@@ -34,18 +34,21 @@ We analysed a list of scientific documents that are hosted in the `papers` folde
 
 ### Folder organization (GEIN)
 
-Data folder contains: 
+The `data/gein` folder contains: 
 * the original data file `data.xlxs` we used for taking notes while we conducted the review of papers. This file is not used in the data analysis; 
 
-* the raw data file `rawData.csv`, which is the csv version of the previous file, is the starting point for the  R data analysis in R; 
+* the raw data file `rawdata.csv`, which is the csv version of the previous file, and is the starting point for cleaning taks; 
 
-* and the `reviewData.rda`, which is the result of doing some data cleaning and preparation tasks for the subsequest analysis.  
+* and the `cleandata.rda`, which is the result of doing some data cleaning and preparation tasks for the subsequent analysis.  
 
-Text folder keeps associated documents such as the `codebook` that describes each column of the `reviewData.rda` dataset, and will contain the markdown file of the final analysis.
+Text folder keeps associated documents such as the `codebook` that describes each column of the `data/gein/cleandata.rda` dataset, and the markdown file `final.html` of the final analysis.
 
-Paper folder will keep a pdf copy of the set of eligible papers for the review.
+Papers folder keeps a pdf copy of the set of eligible papers for the review.
 
 Scripts folder contains the R scripts used in the exploratory data analysis. 
+* `cleaning.R` for cleaning data
+* `analytics.R` for exploratory data analysis  
+* `final.R` for final analysis reported in the paper
 
 ### Folder organization (TGIS)
 
