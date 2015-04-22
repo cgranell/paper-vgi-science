@@ -24,64 +24,121 @@ load(pathToDataFile)
 summary(data)
 
 # number of representative papers 
-numPapers <- length(unique(data$p.id))  # 58
+numPapers <- length(unique(data$id))  
+numPapers # 54
 
 
 ######################################################
 ### R code and functions for exploratory graphs  
 ######################################################
 
-getUniqueVenues <- function() {
-    papers <- unique(data$p.id)
-    numPapers = length(papers)
-    
-    venues <- data.frame(
-        p.id=character(numPapers), 
-        p.venue=character(numPapers),
-        p.venuetype=character(numPapers),
-        stringsAsFactors=FALSE)
-        
-    
-    for (i in 1:numPapers) {
-        firstVenue <- sapply(data[data$p.id==papers[i], c("p.venue", "p.venuetype")], function(d) {d[1]})        
-        # Add a new row (paper id + first ocurrence of venue) to the data.frame
-        venues [i, ] <- c(papers[i], 
-                          as.character(firstVenue[c("p.venue")]), 
-                          as.character(firstVenue[c("p.venuetype")]))   
-    }
-    return (venues)
-}
-
-
-getUniqueSources <- function() {
-    papers <- unique(data$p.id)
-    numPapers = length(papers)
-    
-    sources <- data.frame(
-        p.id=character(numPapers), 
-        f.cat0=character(numPapers),
-        f.cat1=character(numPapers),
-        d.source=character(numPapers),
-        d.official=character(numPapers),
-        stringsAsFactors=FALSE)
-    
-    
-    for (i in 1:numPapers) {
-        firstSource <- sapply(data[data$p.id==papers[i], c("f.cat0", "f.cat1", "f.uc0", "d.source", "d.official")], function(d) {d[1]})        
-        # Add a new row (paper id + first ocurrence of source) to the data.frame
-        sources [i, ] <- c(papers[i],
-                           as.character(firstSource[c("f.cat0")]), 
-                           as.character(firstSource[c("f.cat1")]), 
-                           as.character(firstSource[c("d.source")]), 
-                           as.character(firstSource[c("d.official")]))   
-    }
-    return (sources)
-}
-
-
 percent <- function(x, digits = 2, format = "f", ...) {
     paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
+
+
+# Distribution of Replicability
+
+replicable <- c("id", "data.replicable", "methods.replicable")
+replicable <- c("data.replicable")
+subset <- data[,replicable]
+
+
+data.repli <- count(data, "data.replicable")
+meth.repli <- count(data, "methods.replicable")
+data.repro <- count(data, "data.reproducible")
+meth.repro <- count(data, "methods.reproducible")
+
+df <- cbind(data.repli, meth.repli, data.repro, meth.repro)
+df
+
+
+library(reshape)
+df.melt <- melt(df, id=c("id","time"))
+
+
+
+library(tidyr)
+df.wide<- spread(df, data.replicable, methods.replicable)
+head(df.wide)
+
+
+qplot(data.replicable, data = data)
+qplot(methods , data = data)
+
+qplot(data.replicable, methods.replicable, data = data)
+qplot(data.replicable, methods.replicable, data = data, geom = "jitter")
+
+library(plyr)  # load library plyr
+hm.df <- ddply(data, .(race, program), summarize, absence = mean(absence))
+ggplot(hm.df, aes(race, program, fill = absence)) + geom_tile() + scale_fill_gradient2(high = "red", 
+                                                                                       low = "white")  # plot a heatmap
+
+
+library(vcd)
+
+mosaic(HairEyeColor, shade=TRUE, legend=TRUE)
+
+
+barplot(data[,replicable]) 
+
+#### What are the most frequently VGI data sources? 
+## Run the function table() on the value of "d.source" for each group (d.source, d.official)
+subsetSources0 <- ddply(subsetSources, c("data.replicable", "d.source"), summarise, 
+                        countSource  = as.integer(table(d.source)))
+
+subsetSources0 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
+                        countSource  = length(d.source))
+
+# Get the sources  (d.source), sorted first by category (f.cat0), then by count  
+sourceorder <- subsetSources0$d.source[order(subsetSources0$f.cat0, subsetSources0$countSource)]
+sourceorder <- subsetSources0$d.source[order(subsetSources0$countSource)]
+# Turn d.source into a factor, with levels in the order of sourceorder
+subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
+
+
+# Turn NA as a factor level
+subsetSources0$d.source <- addNA(subsetSources0$d.source)
+# Rename level of a factor by index: change fourh item, NA, to "Unknown".
+levels(subsetSources0$d.source)[19] <- "Unknown"
+levels(subsetSources0$d.source)
+
+############ FINAL FIGURE #################
+ppi=600
+jpeg(filename = "./figures/fig10.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
+## graph of counts, reorder to show counts of "d.source" in order
+ggplot(subsetSources0, aes(x=d.source, y=countSource, fill=f.cat0)) +
+    geom_bar(stat="identity", width=0.6, colour="black") +
+    coord_flip() +
+    theme_bw(base_family = "Times", base_size=10) + 
+    scale_colour_brewer(palette="Set1") +
+    scale_y_continuous(breaks=c(seq(0,28,2))) +
+    labs(x = "VGI source") + 
+    labs(y = "Number of papers") + 
+    #labs(title = "Counts of main VGI sources") +
+    #geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3) +
+    guides(fill=guide_legend(title="Category")) +  # Set the legend title
+    theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+    theme(panel.grid.major.y = element_blank()) # Hide the horizontal grid lines
+dev.off()
+############ END FINAL FIGURE #################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #################
 ###  Distribution of publication venues
@@ -155,48 +212,6 @@ ggplot(subsetVenues0[subsetVenues0$countVenue>1,], aes(x=reorder(p.venue, countV
 #### Are sources used in isolation or in combination?
 #################
 
-subsetSources <- getUniqueSources()
-
-#### What are the most frequently VGI data sources? 
-## Run the function table() on the value of "d.source" for each group (d.source, d.official)
-subsetSources0 <- ddply(subsetSources, c("f.cat0", "f.cat1", "d.source"), summarise, 
-                       countSource  = as.integer(table(d.source)))
-
-subsetSources0 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
-                        countSource  = length(d.source))
-
-# Get the sources  (d.source), sorted first by category (f.cat0), then by count  
-sourceorder <- subsetSources0$d.source[order(subsetSources0$f.cat0, subsetSources0$countSource)]
-sourceorder <- subsetSources0$d.source[order(subsetSources0$countSource)]
-# Turn d.source into a factor, with levels in the order of sourceorder
-subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
-
-
-# Turn NA as a factor level
-subsetSources0$d.source <- addNA(subsetSources0$d.source)
-# Rename level of a factor by index: change fourh item, NA, to "Unknown".
-levels(subsetSources0$d.source)[19] <- "Unknown"
-levels(subsetSources0$d.source)
-
-############ FINAL FIGURE #################
-ppi=600
-jpeg(filename = "./figures/fig10.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
-## graph of counts, reorder to show counts of "d.source" in order
-ggplot(subsetSources0, aes(x=d.source, y=countSource, fill=f.cat0)) +
-    geom_bar(stat="identity", width=0.6, colour="black") +
-    coord_flip() +
-    theme_bw(base_family = "Times", base_size=10) + 
-    scale_colour_brewer(palette="Set1") +
-    scale_y_continuous(breaks=c(seq(0,28,2))) +
-    labs(x = "VGI source") + 
-    labs(y = "Number of papers") + 
-    #labs(title = "Counts of main VGI sources") +
-    #geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3) +
-    guides(fill=guide_legend(title="Category")) +  # Set the legend title
-    theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
-    theme(panel.grid.major.y = element_blank()) # Hide the horizontal grid lines
-dev.off()
-############ END FINAL FIGURE #################
 
 #### What are the most popular sources? 
 ## we must "read" the previous plot accordingly

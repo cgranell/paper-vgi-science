@@ -4,8 +4,7 @@
 This is a bit of exploration to discover current trends in analysis methods applied to the use of VGI (Volunteered Geographic Information) in scientific contexts in general and GIScience in particular. The aim is to perform a systematic mapping review to know the focus and intended use of VGI along with the type of data analsysis and analitical methods used. We are aware that VGI is being used in multiple domains (health monitoring, health prediction adn detection, environmental monitoring, citizen science, data journalism, social sciences, etc) but here the representaive set of papers is mainly limited to the field of natural harzards and crisis management, for which there exists a great deal of related literature since these tow domains have been traditionaly early adopters of VGI.
 
 ## Context
-
-The work makes sense in the context of a recent GIScience 2014 workshop on the [Role of Volunteered Geographic Information in Advancing Science: Effective Utilization](http://web.ornl.gov/sci/gist/workshops/2014/index.shtml). We submitted a [position paper](https://web.ornl.gov/registration_resumes/GIScience@workshop-submitted.pdf) which is a brief introduction of this work. The workshop was driven by a set of research questions around two main themes. 
+The work stated off in the context of a recent GIScience 2014 workshop on the [Role of Volunteered Geographic Information in Advancing Science: Effective Utilization](http://web.ornl.gov/sci/gist/workshops/2014/index.shtml). We submitted a [position paper](https://web.ornl.gov/registration_resumes/GIScience@workshop-submitted.pdf) which is a brief introduction of this work. The workshop was driven by a set of research questions around two main themes. 
 
 ### Opportunities and challenges of VGI utilization
 
@@ -30,13 +29,13 @@ Q4. Does VGI have a potential to impact governance?
 
 ## Results
 
-We analysed a list of scientific documents that are hosted in the `papers` folder. by reviewing these papers, we produced two distinct datasets. Each dataset is the source data for two research works, which results have been submitted to GEIN and TGIS. That's why the data folder is divided into GEIN and TGIS, and scripts names for the TGIS journal have the suffix "tgis". Scripts for the GEIN do not append "gein" to their file names. 
+We analysed a list of scientific documents that are hosted in the `papers` folder. By reviewing these papers, we produced two distinct datasets. Each dataset is the source data for two research works, whose results have been submitted to GEIN and TGIS (both under review). That's why the data folder is divided into GEIN and TGIS, and scripts names for the TGIS journal have the suffix "tgis". Scripts for the GEIN do not append "gein" to their file names. 
 
 ### Folder organization (GEIN)
 
 The `data/gein` folder contains: 
-* the original data file `data.xlxs` we used for taking notes while we conducted the review of papers. This file is not used in the data analysis; 
-* the raw data file `rawdata.csv`, which is the csv version of the previous file, and is the starting point for cleaning taks; 
+* the original data file `rawdata.xlxs` we used for taking notes while we conducted the review of papers. This file is not used in the data analysis; 
+* the raw data file `rawdata.csv`, which is the csv version of the previous file, and is the starting point for cleaning tasks; 
 * and the `cleandata.rda`, which is the result of doing some data cleaning and preparation tasks for the subsequent analysis.  
 
 Text folder keeps associated documents such as the `codebook` that describes each column of the `data/gein/cleandata.rda` dataset, and the markdown file `final.html` of the final analysis.
@@ -44,18 +43,22 @@ Text folder keeps associated documents such as the `codebook` that describes eac
 Papers folder keeps a pdf copy of the set of eligible papers for the review.
 
 Scripts folder contains the R scripts used in the exploratory data analysis:
-* `cleaning.R` for cleaning data
-* `analytics.R` for exploratory data analysis  
-* `final.R` for final analysis reported in the paper
+* `cleaning.R` for cleaning data;
+* `analytics.R` for exploratory data analysis;
+* `final.R` for final analysis reported in the paper.
 
 ### Folder organization (TGIS)
 
 The `data/tgis` folder contains: 
+* the original data file `rawdata.xlxs` we used for taking notes about the support of reproducibilty and replicability  while we conducted the review of papers. This file is not used in the data analysis; 
+* the raw data file `rawdata.csv`, which is the csv version of the previous file, and is the starting point for cleaning tasks; 
+* and the `cleandata.rda`, which is the result of doing some data cleaning and preparation tasks for the subsequent analysis.  
 
 Papers folder keeps a pdf copy of the set of eligible papers for the review.
 
 Scripts folder contains the R scripts used in the exploratory data analysis:
-* `cleaning-tgis.R` for cleaning data
+* `cleaning-tgis.R` for cleaning data;
+* `analytics-tgis.R` for exploratory data analysis; 
 
 ## How to run the scripts
 
