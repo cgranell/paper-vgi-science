@@ -71,3 +71,8 @@ To reproduce all analysis steps:
 
 Alternatively, go straight to step 3 to skip data cleaning step.
 
+## Resources
+* [Software for reproducible science](http://gael-varoquaux.info/programming/software-for-reproducible-science-lets-not-have-a-misunderstanding.html)
+* [EuroScientist: Are reproducibility and replicability under-rated](http://www.euroscientist.com/reproducibility-and-replicability/)
+* [New gold standard established for open and reproducible research - See more at](http://www.cam.ac.uk/research/news/new-gold-standard-established-for-open-and-reproducible-research)
+
