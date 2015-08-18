@@ -1,13 +1,11 @@
 #
 # author: cgranell
-# aim: analytic scripts for exploratory data analysis (MDPI IJGI)
+# aim: analytic scripts for exploratory data analysis (CEUS)
 #
 
 library(ggplot2)## ggplot
 library(plyr)   ## ddply
 
-workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
-setwd(workingPath)
 
 url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus/cleandata.rda"
 dataFile <- "cleandata.rda"
@@ -82,11 +80,10 @@ percent <- function(x, digits = 2, format = "f", ...) {
     paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
 
-#################
-###  Distribution of publication venues
-#### What are the publication venues VGI research & data science have been published in? 
-#### What are the most popular venues (> 1 occurrence)?
-#################
+
+## REVISIT FOR CEUS 
+## Distribution of publication venues 
+## What are the publication venues VGI research & data science have been published in? 
 subsetVenues <- getUniqueVenues()
 
 #### What are the publication venues VGI research & data science have been published in? 
@@ -103,48 +100,11 @@ rateConferences <- (sumConferences / (sumJournals + sumConferences))
 
 # Legend labels including  percent
 legend.txt = c(paste0("Conference: ", percent(rateConferences)), paste0("Journal: ", percent(rateJournals)))
-
-# Get the publication venues (p.venue), sorted first by type, then by count  
-pubsorder <- subsetVenues0$p.venue[order(subsetVenues0$p.venuetype, subsetVenues0$countVenue)]
-# Turn p.venue into a factor, with levels in the order of pubs2order
-subsetVenues0$p.venue <- factor(subsetVenues0$p.venue, levels=pubsorder)
-
-
-############ FINAL FIGURE #################
-ppi=600
-jpeg(filename = "./figures/fig01-publications.jpg",width=9*ppi, height=9*ppi, res=ppi, quality=100)
-
-ggplot(subsetVenues0, aes(x=p.venue, y=countVenue, fill=p.venuetype)) +
-    geom_bar(stat="identity", width=0.6, colour="black") +
-    coord_flip() + 
-    theme_bw(base_family = "Times", base_size=10) + 
-    scale_fill_brewer(palette="Set2") +
-    scale_y_continuous(breaks=c(seq(0,6,1))) +
-    labs(x = "Publication venues") + 
-    labs(y = "Number of papers") + 
-    #labs(title = "Counts of venues by type") + 
-    labs(fill="Venue type") +   # set the legend title
-    theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
-    theme(legend.background=element_blank()) + # Remove overall border of legend
-    theme(legend.key=element_blank()) + # Remove border around each item of legend
-    scale_fill_discrete(labels=legend.txt) + # Change the legend labels
-    geom_text(aes(label=countVenue), hjust=1.5, colour="white", size=2.5) +
-    theme(panel.grid.major.y = element_blank()) # No horizontal grid lines 
-dev.off()
-############ END FINAL FIGURE #################
-
+legend.txt
 
 ## Print list of venues in a tabular format to add it to the paper as annex
 print.data.frame(subsetVenues0[,c("p.venue", "p.venuetype")])
 
-#### What are the most popular venues (> 1 occurrence)?
-ggplot(subsetVenues0[subsetVenues0$countVenue>1,], aes(x=reorder(p.venue, countVenue), y=countVenue, fill=p.venuetype)) +
-    geom_bar(stat="identity") + coord_flip() +
-    theme_bw(base_family = "Avenir", base_size=10) + 
-    labs(x = "Venues") + 
-    labs(y = "Count") + 
-    labs(title = "Most popular venues") +
-    geom_text(aes(label=countVenue), hjust=1.5, colour="white")
 
 
 #################
@@ -207,23 +167,49 @@ dev.off()
 
 
 #################
-### RQ 2: Focus/Intended  uses 
-#### What are the main categories of the paper?
-#### What are the most frequently focus within each category?
-#### What are the most frequently intended uses within the main focus?
+## REVISIT FOR CEUS 
+## RQ 2: Focus/Intended  uses 
+## What are the main categories of the paper?
+## What are the most frequently focus within each category?
+## What are the most frequently intended uses within the main focus?
 
 #### Notes on the variables:
-#### f.cat0: Factor (data-centric, human-centric, crisis-centric), group or main category of the paper
+#### f.cat0: Factor (data-centric, human-centric, application-centric), group or main category of the paper
 #### f.cat1: Factor (several levels), the focus within each category
 #### f.cat2: Factor (several levels), the intended use within each focus
 #################
 
-subsetCat <- data[,c("f.cat0","f.cat1", "f.cat2", "p.year")]
+# how many papers are classified as data-centric
+dc <- data[data$f.cat0=="data-centric",]
+length(unique(dc$p.id)) #40
+
+# how many papers are classified as data-centric
+hc <- data[data$f.cat0=="human-centric",]
+length(unique(hc$p.id)) #19
+
+# how many papers are classified as applicaiton-centric
+ac <- data[data$f.cat0=="application-centric",]
+length(unique(ac$p.id)) #14
+
+total.data <- length(unique(dc$p.id))
+total.human <- length(unique(hc$p.id))
+total.app <- length(unique(ac$p.id))
+
+# How to visualiza these sets? Radial Sets use an alternative visual metaphor to represent overlapping sets compared to Euler Diagram 
+dcu <- unique(dc$p.id)
+hcu <- unique(hc$p.id)
+acu <- unique(ac$p.id)
+count(hcu %in% dcu)
+count(acu %in% dcu)
+count(acu %in% hcu)
+
+
+subsetCat <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "p.year")]
 
 #### What are the distribution of papers along the main categories?
 ## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
 subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise, 
-                    countCat0  = length(f.cat0))
+                    countCat0  = length(unique(p.id)))
 
 ############ FINAL FIGURE #################
 ppi=600
@@ -246,11 +232,71 @@ ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) 
 dev.off()
 ############ END FINAL FIGURE #################
 
+
+subsetUseCases <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1", "p.year")]
+
+#### What are the distribution of use cases along the main categories?
+## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
+subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise, 
+                         countCat0  = length(unique(p.id)))
+ 
+#                         pct = countCat0 / subsetCat0[subsetUseCases$f.cat0,]$countCat0)
+
+levels(subsetUseCases0$f.uc0)[levels(subsetUseCases0$f.uc0)=="natural harzards and man-made events"] <- "natural harzards and\n man-made events"
+
+# Turn NA as a factor level
+subsetUseCases0$f.uc0 <- addNA(subsetUseCases0$f.uc0)
+# Rename level of a factor by index: change fourh item, NA, to "Not specified".
+levels(subsetUseCases0$f.uc0)[4] <- "not specified"
+levels(subsetUseCases0$f.uc0)
+
+
+subsetUseCases0[1, c("pct")] <- percent(subsetUseCases0[1, c("countCat0")] / total.app)
+subsetUseCases0[2, c("pct")] <- percent(subsetUseCases0[2, c("countCat0")] / total.app)
+subsetUseCases0[3, c("pct")] <- percent(subsetUseCases0[3, c("countCat0")] / total.app)
+subsetUseCases0[4, c("pct")] <- percent(subsetUseCases0[4, c("countCat0")] / total.data)
+subsetUseCases0[5, c("pct")] <- percent(subsetUseCases0[5, c("countCat0")] / total.data)
+subsetUseCases0[6, c("pct")] <- percent(subsetUseCases0[6, c("countCat0")] / total.data)
+subsetUseCases0[7, c("pct")] <- percent(subsetUseCases0[7, c("countCat0")] / total.data)
+subsetUseCases0[8, c("pct")] <- percent(subsetUseCases0[8, c("countCat0")] / total.human)
+subsetUseCases0[9, c("pct")] <- percent(subsetUseCases0[9, c("countCat0")] / total.human)
+subsetUseCases0[10, c("pct")] <- percent(subsetUseCases0[10, c("countCat0")] / total.human)
+subsetUseCases0[11, c("pct")] <- percent(subsetUseCases0[11, c("countCat0")] / total.human)
+
+############ FINAL FIGURE #################
+ppi=600
+jpeg(filename = "./figures/fig05b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
+
+## graph of counts, reorder to show counts of "f.cat0" in order
+ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
+  geom_bar(stat="identity", width=0.4, colour="black") + 
+  #coord_flip() +
+  theme_bw(base_family = "Times", base_size=10) + 
+  #geom_text(aes(label=pct), vjust=1.5*subsetUseCases0$pct, colour="black", size=3) +
+  #scale_y_continuous(breaks=c(seq(0,60,5))) +
+  labs(x = "Main categories") + 
+  labs(y = "Number of papers") + 
+  #labs(title = "Number of papers by main categories") +
+  scale_color_brewer(palette="Set2") +
+  labs(fill="Use cases") +   # set the legend title
+  theme(legend.position=c(0,1), legend.justification=c(0,1)) +  # set legend position inside graphic, tpo-left position    
+  theme(legend.background=element_blank()) + # Remove overall border of legend
+  # theme(legend.position="none") + # remove legend
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
+dev.off()
+############ END FINAL FIGURE #################
+
+
+
+
+
 #### What are the distribution of sub-categories/focuses within each category?
 ## Run the function length() on the value of "f.cat1" for each group (f.cat0, f.cat1) 
 ## to sum the ocurrences  of f.cat1 within each group
 subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
-                        countCat1 = length(f.cat1))
+                        #countCat1 = length(f.cat1))
+                        countCat1 = length(unique(f.cat1)))
 
 # Get the sub-category (f.cat1), sorted first by category (f.cat0), then by count  
 cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
@@ -323,7 +369,7 @@ dev.off()
 ## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
 ## to sum the ocurrences  of f.cat2 within each group
 subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise, 
-                    countCat2 = length(f.cat2))
+                    countCat2 = length(unique(p.id)))
 
 dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
 
@@ -334,6 +380,19 @@ dataCentric$f.cat2 <- factor(dataCentric$f.cat2, levels=cat2order)
 
 # A trick to change legend title is to rename the column in the dataframe
 names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
+
+# Change legend labels to add the total number of papers that belong to f.cat1. This make previus figure unecessary
+dataCentric.limits <- c("data preservation",
+                        "data preparation",
+                        "data policies", 
+                        "data contextualization", 
+                        "data quality and assessment")
+
+dataCentric.legend <- c("data preservation (1)",
+                        "data preparation (30)",
+                        "data policies (5)",
+                        "data contextualization (13)",
+                        "data quality \nand assessment (10)")
 
 ############ FINAL FIGURE #################
 ppi=600
@@ -351,6 +410,9 @@ ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
     geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
     theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
     theme(legend.background=element_blank()) + # Remove overall border of legend
+    scale_fill_discrete(
+      limits=dataCentric.limits,
+      labels=dataCentric.legend) +  # custom legend labels
     #theme(legend.key=element_blank()) + # Remove border around each item of legend
     theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
@@ -447,6 +509,21 @@ humanCentric$f.cat2 <- factor(humanCentric$f.cat2, levels=cat2order)
 # A trick to change legend title is to rename the column in the dataframe
 names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 
+# Change legend labels to add the total number of papers that belong to f.cat1.
+humanCentric.limits <- c("human relations",
+                         "human perception",
+                         "human mobility", 
+                         "human behaviour", 
+                         "human activities", 
+                         "human (spatial) perceptions")
+                         
+humanCentric.legend <- c("human relations (3)",
+                         "human perception (1)",
+                         "human mobility (7)", 
+                         "human behaviour (1)", 
+                         "human activities (5)", 
+                         "human (spatial) perceptions (3)")
+                        
 ############ FINAL FIGURE #################
 ppi=600
 jpeg(filename = "./figures/fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
@@ -463,6 +540,9 @@ ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
     #labs(title = "Human-centric category broken by Focus and Intended Use") +
     geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
     guides(fill=guide_legend(title="Focus")) +  # Set the legend title
+    scale_fill_discrete(
+      limits=humanCentric.limits,
+      labels=humanCentric.legend) +  # custom legend labels
     #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
     #theme(legend.background=element_blank()) + # Remove overall border of legend
     #theme(legend.key=element_blank()) + # Remove border around each item of legend
@@ -519,6 +599,19 @@ applicationCentric$f.cat2 <- factor(applicationCentric$f.cat2, levels=cat2order)
 # A trick to change legend title is to rename the column in the dataframe
 names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
 
+# Change legend labels to add the total number of papers that belong to f.cat1. This make previus figure unecessary
+appCentric.limits <- c("recovery and response",
+                       "monitoring",
+                       "health",
+                       "detection and prediction",
+                       "coordination and organization")
+
+appCentric.legend <- c("recovery and response (4)",
+                       "monitoring (4)",
+                       "health (1)",
+                       "detection and prediction (4)",
+                       "coordination and organization (1)")
+
 ############ FINAL FIGURE #################
 ppi=600
 jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=4*ppi, res=ppi, quality=100)
@@ -533,6 +626,9 @@ ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
     labs(x = "Intended uses within application-centric category") + 
     #labs(title = "Application-centric category broken by Focus and Intended Use") +
     geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+    scale_fill_discrete(
+      limits=appCentric.limits,
+      labels=appCentric.legend) +  # custom legend labels
     #theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
     #theme(legend.background=element_blank()) + # Remove overall border of legend
     #theme(legend.key=element_blank()) + # Remove border around each item of legend
@@ -701,124 +797,3 @@ subsetUsers0 <- ddply(subsetUsers, c("f.cat0", "f.uc0", "f.user"), summarise,
 #################
 
 
-########################### BEYOND THIS IS NOT VALID ***************************
-########################### BEYOND THIS IS NOT VALID ***************************
-########################### BEYOND THIS IS NOT VALID ***************************
-
-# library(treemap)    # treemap function 
-# 
-# 
-# # copy defaults settings
-# opar <- par() 
-# 
-# par(mfrow=c(1, 1), mar=c(1, 1, 1, 1))
-# 
-# treemap(subsetCat0, 
-#         index = c("f.cat0", "f.cat1"), 
-#         vSize = "countCat1" , 
-#         vColor = "f.cat1", 
-#         type = "categorical", 
-#         title="Categories and focus",  
-#         fontsize.labels=c(12, 8), 
-#         align.labels=list(c("center", "center"), c("left", "top")),
-#         force.print.labels=TRUE,
-#         lowerbound.cex.labels=1, 
-#         palette="PiYG",
-#         bg.labels="#DCDCDC00", # color is "#RRGGBBAA" and the AA portion is the trasparency
-#         border.col = c("black","white"), # defines line colour 
-#         border.lwds = c(2,1), # defines line width
-#         title.legend="Focus",
-#         position.legend = "bottom") # remove legend)
-# 
-# # restore settings
-# par(opar) 
-# 
-# 
-# # points
-# 
-# 
-# 
-#     geom_segment(aes(yend=f.cat1), xend=0, colour="grey50") +
-#     geom_point(size=3, aes(colour=f.cat0)) +
-#     theme_bw() +
-#     theme(panel.grid.major.y = element_blank()) +    
-#     facet_grid(f.cat0 ~ ., scales="free_y", space="free_y")
-# 
-# 
-#     
-# ggplot(subsetCat0, aes(x=f.cat1, y=countCat1)) + geom_point() + facet_wrap(. ~ f.cat0)
-# 
-# ggplot(subsetCat0, aes(f.cat1)) + 
-#     geom_tile(aes(fill = countCat1), colour = "white") + 
-#     scale_fill_gradient(low = "white", high = "steelblue") +
-#     facet_wrap(f.cat0 ~ .)
-# 
-# 
-# 
-# # Heatmap
-# ggplot(subsetCat0, aes(f.cat1)) + 
-#     geom_tile(aes(fill = countCat1), colour = "white") + 
-#     scale_fill_gradient(low = "white", high = "steelblue") +
-#     facet_wrap(f.cat0 ~ .)
-# 
-# 
-# ggplot(data, aes(x=p.year)) + geom_bar(stat="bin")
-# ggplot(data, aes(x=a.type)) + geom_bar(stat="bin")
-# ggplot(data, aes(x=p.geo)) + geom_bar(stat="bin")
-# ggplot(data, aes(x=f.cat0)) + geom_bar(stat="bin")
-# ggplot(data, aes(x=f.cat1)) + geom_bar(stat="bin")
-# ggplot(data, aes(x=f.uc0)) + geom_bar(stat="bin")
-# ggplot(data, aes(x=f.user)) + geom_bar(stat="bin")
-# ggplot(data, aes(x=d.source)) + geom_bar(stat="bin")
-# 
-# ggplot(data, aes(x=p.year)) + geom_histogram(binwidth=1)
-# ggplot(data, aes(x=a.type)) + geom_histogram(binwidth=1)
-# ggplot(data, aes(x=p.geo)) + geom_histogram(binwidth=1)
-# 
-# ggplot(data, aes(x=p.year, fill=p.geo)) + geom_bar(position="dodge", binwidth=4)
-# ggplot(data, aes(x=p.year, fill=a.type)) + geom_bar(position="dodge", binwidth=2)
-# ggplot(data, aes(x=f.cat0, fill=a.type)) + geom_bar(position="dodge", binwidth=2)
-# 
-# ggplot(data, aes(x=d.source, y=f.cat1, fill=a.type)) + geom_point(alpha = 1/3) # + facet_wrap(. ~ f.cat1)
-# 
-# # extract the lsit of keywords per submission and insret each ne into a different column 
-# #   1. create a data.frame preallocated with 11 columns: submission id and 10 columns for 10 keywords 
-# keywords.data <- data.frame(
-#     id=integer(num.submissions), 
-#     kw.1=character(num.submissions),
-#     kw.2=character(num.submissions), 
-#     kw.3=character(num.submissions), 
-#     kw.4=character(num.submissions), 
-#     kw.5=character(num.submissions), 
-#     kw.6=character(num.submissions), 
-#     kw.7=character(num.submissions), 
-#     kw.8=character(num.submissions), 
-#     kw.9=character(num.submissions), 
-#     kw.10=character(num.submissions), 
-#     stringsAsFactors=FALSE)
-# 
-# 
-# for(i in 1:num.submissions) {
-# #   2. For each submission, extract id and list of keywords, split them, and add  
-#     id <- papers[i, 1]
-#     keywords <- sapply(strsplit(papers[i, 5],";"), function (x) {
-#         ifelse (x=="", NA, gsub("^\\s+|\\s+$", "", x))
-#     })
-#     keywords <- as.vector(keywords)
-# #   3. If a submission has less than 10 keywords, then add whitespaces
-#     keywords[length(keywords)+1:10] <- ""
-# #   4. Add a new row (submission id + 10 keywords) to the newly-created data.frame
-#     keywords.data[i, ] <- c(id, keywords)
-# }
-# 
-# 
-# keywords.data[,1] <- as.integer(keywords.data[,1])
-# 
-# #   5. Merge both data frames by the common column: submission id
-# submissions.clean <- merge(submissions, keywords.data, by="id")
-# 
-# dim(submissions.clean) 
-# # 153 obs. of 15 variables
-# 
-# # Not run: Save clean data (data frame) into a local file 
-# write.csv(submissions.clean, "./data/submissions-clean.csv")

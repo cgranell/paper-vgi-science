@@ -86,27 +86,5 @@ levels(data$d.source)[levels(data$d.source)=="Synthetic cell phone data"] <- "GP
 # number of representative papers 
 length(unique(data$p.id))  # 58
 
-# NEW
-# how many papers are classified as data-centric
-dc <- data[data$f.cat0=="data-centric",]
-length(unique(dc$p.id)) #40
-
-# how many papers are classified as data-centric
-hc <- data[data$f.cat0=="human-centric",]
-length(unique(hc$p.id)) #19
-
-# how many papers are classified as applicaiton-centric
-ac <- data[data$f.cat0=="application-centric",]
-length(unique(ac$p.id)) #14
-
-# How to visualiza these sets? Radial Sets use an alternative visual metaphor to represent overlapping sets compared to Euler Diagram 
-dcu <- unique(dc$p.id)
-hcu <- unique(hc$p.id)
-acu <- unique(ac$p.id)
-hcu %in% dcu
-acu %in% dcu
-acu %in% hcu
-
-
 # Save data frame object into a local file 
-save(data, file=paste("./data/gein/", dataFile, sep=""))
+save(data, file=paste("./data/ceus/", dataFile, sep=""))

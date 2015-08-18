@@ -1,0 +1,471 @@
+---
+title: "VGI papers analysis for creating final figures included in submitted paper"
+author: "Carlos Granell"
+date: "August 2015"
+output: html_document
+---
+
+## Synopsis
+This paper investigates the research that has been carried out on volunteered geographic information using the method of a systematic mapping study. It describes the development of a classification schema that captures three levels of main focus, sub-focus and intended use, and analyzes the relationships with the employed data sources and analysis methods. It purposefully limits the scope to the pioneering field of crisis management and disaster response, but the described approach - the systematic mapping study - and the developed classification schema are easily adaptable to different application domains or future developments. 
+
+The results show that a hypothesized consolidation of research, characterized through the building of canonical bodies of knowledge and advanced application cases with refined methodology, has not yet happened. The majority of the studies investigate the challenges and potential solutions of data handling, with fewer studies focusing on socio-technological issues or advanced applications. This trend is currently showing no sign of change, highlighting that VGI research is still very much technologydriven as opposed to theory- or application-driven. From the results of the systematic mapping study, the authors formulate and discuss several research objectives for future work, which could lead to a stronger, more theory-driven treatment of the topic VGI in GIScience.
+
+## Loading data
+
+```{r global_options, include=FALSE}
+##  Packages required for the analysis 
+suppressWarnings(require(plyr))
+suppressWarnings(require(ggplot2))
+suppressWarnings(require(gridExtra))  # grid.arrange
+suppressWarnings(require(knitr))
+
+opts_chunk$set(fig.width=12, fig.height=8, warning=FALSE, message=FALSE)
+
+#  Print in digits rather than scientific notation
+options("scipen"=100, "digits"=0)
+```
+
+```{r loading_data}
+setwd("C:/Users/cgranell/Data/MyCode/paper-vgi-science/")
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus/cleandata.rda"
+dataFile <- "cleandata.rda"
+pathToDataFile <- paste("./data/ceus/", dataFile, sep="")
+
+if (!file.exists(pathToDataFile)) {
+    file <- download.file(url, destfile=pathToDataFile)
+}
+
+load(pathToDataFile)
+```
+
+## Preprocessing scripts 
+
+```{r}
+getUniqueVenues <- function() {
+    papers <- unique(data$p.id)
+    numPapers = length(papers)
+    
+    venues <- data.frame(
+        p.id=character(numPapers), 
+        p.venue=character(numPapers),
+        p.venuetype=character(numPapers),
+        stringsAsFactors=FALSE)
+        
+    
+    for (i in 1:numPapers) {
+        firstVenue <- sapply(data[data$p.id==papers[i], c("p.venue", "p.venuetype")], function(d) {d[1]})        
+        # Add a new row (paper id + first ocurrence of venue) to the data.frame
+        venues [i, ] <- c(papers[i], 
+                          as.character(firstVenue[c("p.venue")]), 
+                          as.character(firstVenue[c("p.venuetype")]))   
+    }
+    return (venues)
+}
+```
+
+```{r}
+getUniqueSources <- function() {
+    papers <- unique(data$p.id)
+    numPapers = length(papers)
+    
+    sources <- data.frame(
+        p.id=character(numPapers), 
+        f.cat0=character(numPapers),
+        f.cat1=character(numPapers),
+        d.source=character(numPapers),
+        d.official=character(numPapers),
+        stringsAsFactors=FALSE)
+    
+    
+    for (i in 1:numPapers) {
+        firstSource <- sapply(data[data$p.id==papers[i], c("f.cat0", "f.cat1", "f.uc0", "d.source", "d.official")], function(d) {d[1]})        
+        # Add a new row (paper id + first ocurrence of source) to the data.frame
+        sources [i, ] <- c(papers[i],
+                           as.character(firstSource[c("f.cat0")]), 
+                           as.character(firstSource[c("f.cat1")]), 
+                           as.character(firstSource[c("d.source")]), 
+                           as.character(firstSource[c("d.official")]))   
+    }
+    return (sources)
+}
+```
+
+
+```{r}
+percent <- function(x, digits = 2, format = "f", ...) {
+    paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+}
+```
+
+
+## Results: Final figures  
+R scripts below describe how the data were processed for creating figures included in the submitted paper.
+
+### Distribution of publication venues
+What are the publication venues VGI research & data science have been published in? 
+
+```{r}
+# get the list of unique venues
+subsetVenues <- getUniqueVenues()
+
+# Run the function table() on the value of "p.venue" for each group (p.venue, p.venuetype)
+subsetVenues0 <- ddply(subsetVenues, c("p.venue", "p.venuetype"), summarise, 
+           countVenue  = as.integer(table(p.venue)))
+
+# Journal and conference rates. Note that total is 57 because one paper is a technical report
+sumJournals <- sum(subsetVenues0[subsetVenues0$p.venuetype=="journal", c("countVenue")])
+sumConferences <- sum(subsetVenues0[subsetVenues0$p.venuetype=="conference", c("countVenue")])
+rateJournals <- (sumJournals / (sumJournals + sumConferences))
+rateConferences <- (sumConferences / (sumJournals + sumConferences))
+
+# Legend labels including  percent
+legend.txt = c(paste0("Conference: ", percent(rateConferences)), paste0("Journal: ", percent(rateJournals)))
+legend.txt
+
+
+### RQ2: Focus and intended uses of papers
+```
+
+Fig 5a shows the distribution of papers along the main categories 
+```{r}
+
+subsetCat <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "p.year")]
+# Run the function length() on the unique values of "p.id" for each group (f.cat0) 
+subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise, 
+                    countCat0  = length(unique(p.id)))
+```
+
+```{r, echo=FALSE}
+fig5a <- ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
+        geom_bar(stat="identity", width=0.4, colour="black") + 
+        #coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) + 
+        geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
+        scale_y_continuous(breaks=c(seq(0,60,5))) +
+        labs(x = "Main categories") + 
+        labs(y = "Number of papers") + 
+        labs(title = "Figure 5a:  Number of papers by main category") +
+        scale_colour_brewer(palette="Set1") +
+        theme(legend.position="none") + # remove legend
+        theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
+
+```
+
+Fig5b shows the distribution of use cases along the main categories
+```{r}
+subsetUseCases <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1", "p.year")]
+
+# Run the function length() on the unique values of "p.id" for each group (f.cat0, f.uc0) 
+subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise, 
+                         countCat0  = length(unique(p.id)))
+
+levels(subsetUseCases0$f.uc0)[levels(subsetUseCases0$f.uc0)=="natural harzards and man-made events"] <- "natural harzards and\n man-made events"
+
+# Turn NA as a factor level
+subsetUseCases0$f.uc0 <- addNA(subsetUseCases0$f.uc0)
+# Rename level of a factor by index: change fourh item, NA, to "not specified".
+levels(subsetUseCases0$f.uc0)[4] <- "not specified"
+```
+
+```{r echo=FALSE}
+fig5b <- ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
+        geom_bar(stat="identity", width=0.4, colour="black") + 
+        #coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) + 
+        #geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
+        #scale_y_continuous(breaks=c(seq(0,60,5))) +
+        labs(x = "Main categories") + 
+        labs(y = "Number of papers") + 
+        labs(title = "Figure5b: Overall use cases by main category") +
+        scale_color_brewer(palette="Set2") +
+        labs(fill="Use cases") +   # set the legend title
+        theme(legend.position=c(0,1), legend.justification=c(0,1)) +  # set legend position inside graphic, tpo-left position    
+        theme(legend.background=element_blank()) + # Remove overall border of legend
+        # theme(legend.position="none") + # remove legend
+        theme(panel.grid.major.x = element_blank(),
+         panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
+```
+
+```{r echo=FALSE}
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig5a, fig5b, ncol=2, nrow=1))
+```
+
+
+Fig 6 shows the distribution of sub-categories/focuses within each category
+
+```{r}
+# Run the function length() on the unique value of "p.id" for each group (f.cat0, f.cat1) 
+# to sum the ocurrences  of f.cat1 within each group
+subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
+                        countCat1 = length(f.cat1))
+
+# Get the sub-category (f.cat1), sorted first by category (f.cat0), then by count  
+cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
+# Turn f.cat1 into a factor, with levels in the order of cat1order
+subsetCat1$f.cat1 <- factor(subsetCat1$f.cat1, levels=cat1order)
+```
+
+```{r echo=FALSE}
+fig6 <- ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
+        geom_bar(stat="identity", width=0.6, colour="black") + 
+        coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) + 
+        theme(panel.grid.major.y = element_blank()) +
+        scale_colour_brewer(palette="Set1") +
+        #scale_fill_brewer("clarity") +
+        geom_text(aes(label=countCat1), hjust=1.5, colour="black", size=3) +
+        scale_y_continuous(breaks=c(seq(0,30,5))) +
+        labs(x = "Sub-category / focus") + 
+        labs(y = "Number of papers") +
+        guides(fill=guide_legend(title="Main categories")) +  # Set the legend title
+        theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+        theme(legend.background=element_blank()) + # Remove overall border of legend
+        labs(title = "Figure 6: Number of papers by category and sub-category (or focus)") +
+
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig6, ncol=1, nrow=1))
+```
+
+
+Fig 7 shows the most frequently intended uses within the data-centric category
+ 
+ 
+```{r}
+# Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
+# to sum the ocurrences  of f.cat2 within each group
+subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise, 
+                    countCat2 = length(f.cat2))
+
+dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
+
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
+cat2order <- dataCentric$f.cat2[order(dataCentric$f.cat1, dataCentric$countCat2)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+dataCentric$f.cat2 <- factor(dataCentric$f.cat2, levels=cat2order)
+
+# A trick to change legend title is to rename the column in the dataframe
+names(dataCentric)[names(dataCentric)=="f.cat1"]  <- "Focus"
+
+# Change legend labels to add the total number of papers that belong to each subcategory (f.cat1).
+dataCentric.limits <- c("data preservation",
+                        "data preparation",
+                        "data policies", 
+                        "data contextualization", 
+                        "data quality and assessment")
+
+dataCentric.legend <- c("data preservation (1)",
+                        "data preparation (30)",
+                        "data policies (5)",
+                        "data contextualization (13)",
+                        "data quality \nand assessment (10)")
+
+```
+
+```{r echo=FALSE}
+fig7 <- ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+        geom_bar(stat="identity", width=0.6, colour="black") + 
+        coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) +
+        scale_colour_brewer(palette="Set1") +
+        scale_y_continuous(breaks=c(seq(0,15,1))) +
+        labs(y = "Number of papers") + 
+        labs(x = "Intended uses within data-centric category") + 
+        labs(title = "Figure 7:  Intended uses by focus (sub-category) within the data-centric category") +
+        geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+        theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
+        theme(legend.background=element_blank()) + # Remove overall border of legend
+        scale_fill_discrete(
+          limits=dataCentric.limits,
+          labels=dataCentric.legend) +  # custom legend labels
+        #theme(legend.key=element_blank()) + # Remove border around each item of legend
+        theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig7, ncol=1, nrow=1))
+names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
+```
+
+Fig 8 shows the most frequently intended uses within the human-centric category
+```{r}
+humanCentric <- subset(subsetCat2,f.cat0=="human-centric")
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
+cat2order <- humanCentric$f.cat2[order(humanCentric$f.cat1, humanCentric$countCat2)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+humanCentric$f.cat2 <- factor(humanCentric$f.cat2, levels=cat2order)
+
+# A trick to change legend title is to rename the column in the dataframe
+names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
+
+# Change legend labels to add the total number of papers that belong to f.cat1.
+humanCentric.limits <- c("human relations",
+                         "human perception",
+                         "human mobility", 
+                         "human behaviour", 
+                         "human activities", 
+                         "human (spatial) perceptions")
+                         
+humanCentric.legend <- c("human relations (3)",
+                         "human perception (1)",
+                         "human mobility (7)", 
+                         "human behaviour (1)", 
+                         "human activities (5)", 
+                         "human (spatial) perceptions (3)")
+```
+
+```{r echo=FALSE}
+fig8 <- ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+        geom_bar(stat="identity", width=0.6, colour="black") +
+        coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) +
+        scale_colour_brewer(palette="Set1") +
+        scale_y_continuous(breaks=c(seq(0,3,1))) +
+        labs(y = "Number of papers") + 
+        labs(x = "Intended uses within human-centric category") + 
+        labs(title = "Figure 8: Intended uses by focus (sub-category) within the human-centric category") +
+        geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+        guides(fill=guide_legend(title="Focus")) +  # Set the legend title
+        scale_fill_discrete(
+          limits=humanCentric.limits,
+          labels=humanCentric.legend) +  # custom legend labels
+        #theme(legend.position=c(1.5,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+        #theme(legend.background=element_blank()) + # Remove overall border of legend
+        #theme(legend.key=element_blank()) + # Remove border around each item of legend
+        theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig8, ncol=1, nrow=1))
+names(humanCentric)[names(humanCentric)=="Focus"]  <- "f.cat1"
+```
+
+
+Fig 9 shows the most frequently intended uses within the application-centric category
+```{r}
+applicationCentric <- subset(subsetCat2,f.cat0=="application-centric")
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
+cat2order <- applicationCentric$f.cat2[order(applicationCentric$f.cat1, applicationCentric$countCat2)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+applicationCentric$f.cat2 <- factor(applicationCentric$f.cat2, levels=cat2order)
+
+# A trick to change legend title is to rename the column in the dataframe
+names(applicationCentric)[names(applicationCentric)=="f.cat1"]  <- "Focus"
+
+# Change legend labels to add the total number of papers that belong to f.cat1.
+appCentric.limits <- c("recovery and response",
+                       "monitoring",
+                       "health",
+                       "detection and prediction",
+                       "coordination and organization")
+
+appCentric.legend <- c("recovery and response (4)",
+                       "monitoring (4)",
+                       "health (1)",
+                       "detection and prediction (4)",
+                       "coordination and organization (1)")
+
+```
+
+```{r echo=FALSE}
+fig9 <- ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+        geom_bar(stat="identity", width=0.6, colour="black") +
+        coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) +
+        scale_colour_brewer(palette="Set1") +
+        scale_y_continuous(breaks=c(seq(0,4,1))) +
+        labs(y = "Number of papers") + 
+        labs(x = "Intended uses within application-centric category") + 
+        labs(title = "Figure 9: Intended uses by focus (sub-category) within the application-centric category") +
+        geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
+        scale_fill_discrete(
+          limits=appCentric.limits,
+          labels=appCentric.legend) +  # custom legend labels
+        #theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+        #theme(legend.background=element_blank()) + # Remove overall border of legend
+        #theme(legend.key=element_blank()) + # Remove border around each item of legend
+        theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
+
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig9, ncol=1, nrow=1))
+names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
+```
+
+
+
+### RQ3: Data Sources
+
+Fig 10 shows the most frequently VGI sources
+```{r}
+subsetSources <- getUniqueSources()
+
+# Run the function table() on the value of "d.source" for each group (d.source, d.official)
+subsetSources0 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
+                        countSource  = length(d.source))
+
+# Get the sources  (d.source), sorted by count  
+sourceorder <- subsetSources0$d.source[order(subsetSources0$countSource)]
+
+# Turn d.source into a factor, with levels in the order of sourceorder
+subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
+
+# Turn NA as a factor level
+subsetSources0$d.source <- addNA(subsetSources0$d.source)
+# Rename level of a factor by index: change fourh item, NA, to "Unknown".
+levels(subsetSources0$d.source)[19] <- "Unknown"
+```
+
+```{r echo=FALSE}
+fig10 <- ggplot(subsetSources0, aes(x=d.source, y=countSource, fill=f.cat0)) +
+        geom_bar(stat="identity", width=0.6, colour="black") +
+        coord_flip() +
+        theme_bw(base_family = "Times", base_size=10) + 
+        scale_colour_brewer(palette="Set1") +
+        scale_y_continuous(breaks=c(seq(0,28,2))) +
+        labs(x = "VGI source") + 
+        labs(y = "Number of papers") + 
+        labs(title = "Figure 10:  VGI sources employed by main category") +
+        #geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3) +
+        guides(fill=guide_legend(title="Category")) +  # Set the legend title
+        theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
+        theme(panel.grid.major.y = element_blank()) # Hide the horizontal grid lines
+
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig10, ncol=1, nrow=1))
+
+```
+
+## Distribution of intended uses over time 
+Fig 11 shows the distribution of intended uses over time by main category
+
+```{r}
+# Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2, p.year) 
+# to sum the ocurrences  of f.cat2 within each group
+subsetCat3 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2", "p.year"), summarise, 
+                    countCat3 = length(f.cat2))
+
+# Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count
+cat2order <- subsetCat3$f.cat2[order(subsetCat3$f.cat1, subsetCat3$countCat3)]
+# Turn f.cat2 into a factor, with levels in the order of cat2order
+subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
+```
+
+```{r echo=FALSE}
+fig11 <- ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
+        geom_point(aes(size=countCat3)) + 
+        scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
+        theme_bw(base_family = "Times", base_size=10) + 
+        scale_size_area(max_size=10) +   # scale dots to make them bigger
+        labs(colour="Category", size="Number of\n papers") +
+        labs(x = "Year of publication") + 
+        labs(y = "Intended uses") + 
+        labs(title = "Figure 11: Intended uses over time by main category") +
+        geom_text(aes(label=countCat3), vjust=-0.1, colour="grey30", size=2)   # Add labels from data
+
+suppressWarnings(grid.newpage())
+suppressWarnings(grid.arrange(fig11, ncol=1, nrow=1))
+```
+
+
+```{r echo=FALSE}
+#suppressWarnings(knit2html(input = "final.Rmd"))
+```
