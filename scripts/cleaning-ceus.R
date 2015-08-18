@@ -4,11 +4,11 @@
 # 
 #
 
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ijgi/rawdata.csv"
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus/rawdata.csv"
 rawFile <- "rawdata.csv"
 dataFile <- "cleandata.rda"
 
-pathToRawFile <- paste("./data/ijgi", rawFile, sep="")
+pathToRawFile <- paste("./data/ceus", rawFile, sep="")
 if (!file.exists(pathToRawFile)) {
     file <- download.file(url, destfile=pathToRawFile)
 }

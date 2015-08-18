@@ -9,9 +9,9 @@ library(plyr)   ## ddply
 workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
 
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/gein/cleandata.rda"
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus/cleandata.rda"
 dataFile <- "cleandata.rda"
-pathToDataFile <- paste("./data/gein/", dataFile, sep="")
+pathToDataFile <- paste("./data/ceus/", dataFile, sep="")
 
 if (!file.exists(pathToDataFile)) {
     file <- download.file(url, destfile=pathToDataFile)
