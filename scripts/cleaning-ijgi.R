@@ -4,14 +4,11 @@
 # 
 #
 
-workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
-setwd(workingPath)
-
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/gein/rawdata.csv"
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ijgi/rawdata.csv"
 rawFile <- "rawdata.csv"
 dataFile <- "cleandata.rda"
 
-pathToRawFile <- paste("./data/gein", rawFile, sep="")
+pathToRawFile <- paste("./data/ijgi", rawFile, sep="")
 if (!file.exists(pathToRawFile)) {
     file <- download.file(url, destfile=pathToRawFile)
 }
@@ -88,6 +85,28 @@ levels(data$d.source)[levels(data$d.source)=="Synthetic cell phone data"] <- "GP
 
 # number of representative papers 
 length(unique(data$p.id))  # 58
+
+# NEW
+# how many papers are classified as data-centric
+dc <- data[data$f.cat0=="data-centric",]
+length(unique(dc$p.id)) #40
+
+# how many papers are classified as data-centric
+hc <- data[data$f.cat0=="human-centric",]
+length(unique(hc$p.id)) #19
+
+# how many papers are classified as applicaiton-centric
+ac <- data[data$f.cat0=="application-centric",]
+length(unique(ac$p.id)) #14
+
+# How to visualiza these sets? Radial Sets use an alternative visual metaphor to represent overlapping sets compared to Euler Diagram 
+dcu <- unique(dc$p.id)
+hcu <- unique(hc$p.id)
+acu <- unique(ac$p.id)
+hcu %in% dcu
+acu %in% dcu
+acu %in% hcu
+
 
 # Save data frame object into a local file 
 save(data, file=paste("./data/gein/", dataFile, sep=""))

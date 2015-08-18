@@ -1,11 +1,10 @@
 #
 # author: cgranell
-# aim: analytic scripts for exploratory data analysis 
+# aim: analytic scripts for exploratory data analysis (MDPI IJGI)
 #
 
 library(ggplot2)## ggplot
 library(plyr)   ## ddply
-library(xtable)  ## not required...it generates tables in latex format from data frames
 
 workingPath <- "C:/Users/cgranell/Data/MyCode/paper-vgi-science/"
 setwd(workingPath)
