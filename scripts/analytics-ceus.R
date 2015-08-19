@@ -133,9 +133,24 @@ subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
 
 # Turn NA as a factor level
 subsetSources0$d.source <- addNA(subsetSources0$d.source)
-# Rename level of a factor by index: change fourh item, NA, to "Unknown".
-levels(subsetSources0$d.source)[19] <- "Unknown"
+# Rename level of a factor by index: change fourh item, NA, to "Not specified".
+levels(subsetSources0$d.source)[19] <- "Not specified"
 levels(subsetSources0$d.source)
+
+ppi=600
+jpeg(filename = "./figures/ceus-fig10.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
+ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
+  geom_point(aes(size=countSource), shape=21, colour="black") +
+  scale_size_area(max_size=25, guide=FALSE) + 
+  theme_bw(base_family = "Times", base_size=10) + 
+  guides(fill=FALSE) +
+  labs(x = "Main categories") + 
+  labs(y = "VGI source") +
+  labs(title = "Figure 10:  VGI sources used by main category") +
+  scale_colour_brewer(palette="Set1") +
+  geom_text(aes(label=countSource), vjust=-0.1, colour="grey30", size=2)+   # Add labels from data
+  theme(panel.grid.major.x = element_blank()) # Hide the veritical grid lines
+dev.off()
 
 ############ FINAL FIGURE #################
 ppi=600
@@ -686,17 +701,17 @@ subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig11.jpg",width=6*ppi, height=8*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig11.jpg",width=6*ppi, height=9*ppi, res=ppi, quality=100)
 ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
     geom_point(aes(size=countCat3)) + 
     scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
     theme_bw(base_family = "Times", base_size=10) + 
-    scale_size_area(max_size=10) +   # scale dots to make them bigger
+    scale_size_area(max_size=12) +   # scale dots to make them bigger
     labs(colour="Category", size="Number of\n papers") +
     labs(x = "Year of publication") + 
     labs(y = "Intended uses") + 
     #labs(title = "Intended uses over time") +
-    geom_text(aes(label=countCat3), vjust=-0.1, colour="grey30", size=2)   # Add labels from data
+    geom_text(aes(label=countCat3), vjust=0.1, colour="black", size=2)   # Add labels from data
     
 dev.off()
 ############ END FINAL FIGURE #################

@@ -193,7 +193,7 @@ suppressWarnings(grid.arrange(fig5a, fig5b, ncol=2, nrow=1))
 ```
 
 
-Fig 6 shows the distribution of sub-categories/focuses within each category
+Fig 6 shows the distribution of sub-categories/focuses within each category. (Note 19 Aug 2015: This figure will not be part of the paper. Instead, we have updated the next three figures to add the total number of papers per subcategory in parenthesis in the legend. For the time being, this figure is still relevant for internal use in case more papers are added to the review)
 
 ```{r}
 # Run the function length() on the unique value of "p.id" for each group (f.cat0, f.cat1) 
@@ -259,7 +259,7 @@ dataCentric.legend <- c("data preservation (1)",
                         "data preparation (30)",
                         "data policies (5)",
                         "data contextualization (13)",
-                        "data quality \nand assessment (10)")
+                        "data quality and assessment (10)")
 
 ```
 
@@ -410,24 +410,23 @@ subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
 
 # Turn NA as a factor level
 subsetSources0$d.source <- addNA(subsetSources0$d.source)
-# Rename level of a factor by index: change fourh item, NA, to "Unknown".
-levels(subsetSources0$d.source)[19] <- "Unknown"
+# Rename level of a factor by index: change fourh item, NA, to "Not specified".
+levels(subsetSources0$d.source)[19] <- "Not specified"
 ```
 
 ```{r echo=FALSE}
-fig10 <- ggplot(subsetSources0, aes(x=d.source, y=countSource, fill=f.cat0)) +
-        geom_bar(stat="identity", width=0.6, colour="black") +
-        coord_flip() +
+fig10 <- ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
+        geom_point(aes(size=countSource), shape=21, colour="black") +
+        scale_size_area(max_size=25, guide=FALSE) + 
         theme_bw(base_family = "Times", base_size=10) + 
+        guides(fill=FALSE) +
+        labs(x = "Main categories") + 
+        labs(y = "VGI source") +
+        labs(title = "Figure 10:  VGI sources used by main category") +
         scale_colour_brewer(palette="Set1") +
-        scale_y_continuous(breaks=c(seq(0,28,2))) +
-        labs(x = "VGI source") + 
-        labs(y = "Number of papers") + 
-        labs(title = "Figure 10:  VGI sources employed by main category") +
-        #geom_text(aes(label=countSource), hjust=1.5, colour="black", size=3) +
-        guides(fill=guide_legend(title="Category")) +  # Set the legend title
-        theme(legend.position=c(1,0), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
-        theme(panel.grid.major.y = element_blank()) # Hide the horizontal grid lines
+        geom_text(aes(label=countSource), vjust=0.1, colour="grey30", size=2)+   # Add labels from data
+        theme(panel.grid.major.x = element_blank()) # Hide the vertical grid lines
+
 
 suppressWarnings(grid.newpage())
 suppressWarnings(grid.arrange(fig10, ncol=1, nrow=1))
@@ -454,12 +453,12 @@ fig11 <- ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
         geom_point(aes(size=countCat3)) + 
         scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
         theme_bw(base_family = "Times", base_size=10) + 
-        scale_size_area(max_size=10) +   # scale dots to make them bigger
+        scale_size_area(max_size=12) +   # scale dots to make them bigger
         labs(colour="Category", size="Number of\n papers") +
         labs(x = "Year of publication") + 
         labs(y = "Intended uses") + 
         labs(title = "Figure 11: Intended uses over time by main category") +
-        geom_text(aes(label=countCat3), vjust=-0.1, colour="grey30", size=2)   # Add labels from data
+        geom_text(aes(label=countCat3), vjust=0.1, colour="black", size=2)   # Add labels from data
 
 suppressWarnings(grid.newpage())
 suppressWarnings(grid.arrange(fig11, ncol=1, nrow=1))
