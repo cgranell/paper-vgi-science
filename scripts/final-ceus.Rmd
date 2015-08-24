@@ -417,7 +417,7 @@ levels(subsetSources0$d.source)[19] <- "Not specified"
 ```{r echo=FALSE}
 fig10 <- ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
         geom_point(aes(size=countSource), shape=21, colour="black") +
-        scale_size_area(max_size=25, guide=FALSE) + 
+        scale_size_area(max_size=15, guide=FALSE) + 
         theme_bw(base_family = "Times", base_size=10) + 
         guides(fill=FALSE) +
         labs(x = "Main categories") + 

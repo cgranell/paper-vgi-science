@@ -141,12 +141,12 @@ ppi=600
 jpeg(filename = "./figures/ceus-fig10.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
   geom_point(aes(size=countSource), shape=21, colour="black") +
-  scale_size_area(max_size=25, guide=FALSE) + 
+  scale_size_area(max_size=15, guide=FALSE) + 
   theme_bw(base_family = "Times", base_size=10) + 
   guides(fill=FALSE) +
   labs(x = "Main categories") + 
   labs(y = "VGI source") +
-  labs(title = "Figure 10:  VGI sources used by main category") +
+  #labs(title = "Figure 10:  VGI sources used by main category") +
   scale_colour_brewer(palette="Set1") +
   geom_text(aes(label=countSource), vjust=-0.1, colour="grey30", size=2)+   # Add labels from data
   theme(panel.grid.major.x = element_blank()) # Hide the veritical grid lines
@@ -228,7 +228,7 @@ subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise,
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig05a.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig05a.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
@@ -254,7 +254,6 @@ subsetUseCases <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1",
 ## Run the function length() on the value of "f.cat0" for each group (f.cat0) 
 subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise, 
                          countCat0  = length(unique(p.id)))
- 
 #                         pct = countCat0 / subsetCat0[subsetUseCases$f.cat0,]$countCat0)
 
 levels(subsetUseCases0$f.uc0)[levels(subsetUseCases0$f.uc0)=="natural harzards and man-made events"] <- "natural harzards and\n man-made events"
@@ -280,7 +279,7 @@ subsetUseCases0[11, c("pct")] <- percent(subsetUseCases0[11, c("countCat0")] / t
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig05b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig05b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
@@ -407,11 +406,11 @@ dataCentric.legend <- c("data preservation (1)",
                         "data preparation (30)",
                         "data policies (5)",
                         "data contextualization (13)",
-                        "data quality \nand assessment (10)")
+                        "data quality and assessment (10)")
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig07.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig07.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.6, colour="black") + 
@@ -541,7 +540,7 @@ humanCentric.legend <- c("human relations (3)",
                         
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 
     
 ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
@@ -629,7 +628,7 @@ appCentric.legend <- c("recovery and response (4)",
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig09.jpg",width=6*ppi, height=4*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig09.jpg",width=6*ppi, height=4*ppi, res=ppi, quality=100)
 
 ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.6, colour="black") +
@@ -758,7 +757,7 @@ levels(subsetUseCases0$f.uc0)
 
 ############ TENTATIVE FIGURE #################
 ppi=600
-jpeg(filename = "./figures/fig05b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig05b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
