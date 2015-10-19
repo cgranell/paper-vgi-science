@@ -819,7 +819,7 @@ function curves() {
   t.call(chart.tension(this.checked ? .5 : 1));
 }
 
-d3.csv("parallelset-tgis.csv", function(error, csv) {
+d3.csv("tgis.csv", function(error, csv) {
   vis.datum(csv).call(chart);
 
   window.icicle = function() {
