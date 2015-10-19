@@ -72,14 +72,18 @@ pre, code { font-family: "Menlo", monospace; }
 </style>
 
 <body>
-<h2>Parallel Sets diagram to explore how replicability and reproducibilty conditions are related in VGI studies</h2>
-<h3>Source: The diagram is built upon the Parallel Sets JavaScript library by Jason Davies: http://www.jasondavies.com/) 
-<h3>Citation: Ostermann, F.A. and Granell, C.(2016), Advancing Science with VGI: Reproducibility and Replicability of Recent Studies within VGI. Transaction in GIS</h3>
+<h3>Parallel Sets diagram to explore how replicability and reproducibilty conditions are related in VGI studies</h3>
 
 <div id="vis"></div>
 <div class="options">
   <span class="source"><a href="https://github.com/cgranell/paper-vgi-science">Data</a>.</span>
+  <span class="source"><a href="">Data</a>.</span>
+  
   <span class="curves"><label for="curved"><input type="checkbox" id="curved" onchange="curves.call(this)"> Curves?</label></span>
+
+  The diagram is built upon the Parallel Sets JavaScript library by Jason Davies: http://www.jasondavies.com/
+
+  Citation: Ostermann, F.A. and Granell, C.(2016), Advancing Science with VGI: Reproducibility and Replicability of Recent Studies within VGI. Transaction in GIS
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
@@ -113,67 +117,7 @@ function curves() {
   t.call(chart.tension(this.checked ? .5 : 1));
 }
 
-tgis = "Reproducibility,Replicability,Year
-None,None,2013
-None,Full,2010
-None,Full,2014
-None,None,2012
-None,Limited,2014
-None,Limited,2014
-None,Limited,2011
-None,Limited,2013
-Limited,Full,2014
-None,Full,2012
-None,Full,2015
-None,None,2011
-None,None,2011
-None,Full,2013
-None,None,2010
-None,Full,2010
-None,Limited,2010
-None,None,2013
-None,Limited,2013
-None,Full,2012
-None,Full,2011
-None,None,2012
-None,Full,2014
-None,Full,2014
-Limited,Full,2014
-None,Full,2014
-None,Limited,2011
-None,None,2008
-None,Full,2010
-None,Limited,2012
-None,None,2013
-None,None,2010
-None,None,2014
-None,Limited,2013
-Limited,Full,2013
-None,Full,2013
-Limited,Limited,2013
-None,Full,2009
-None,None,2011
-None,Full,2012
-None,Limited,2012
-None,None,2013
-None,Full,2013
-None,Full,2012
-None,None,2013
-None,Full,2009
-None,Full,2011
-None,None,2013
-Limited,Full,2013
-None,Full,2013
-None,Limited,2013
-None,Limited,2013
-None,Limited,2012
-None,Limited,2013
-None,Limited,2014
-None,Full,2014
-Limited,Limited,2013
-None,None,2013";
-
-//d3.csv("tgis.csv", function(error, csv) {
+d3.csv("tgis.csv", function(error, csv) {
   csv = tgis
   vis.datum(csv).call(chart);
 
@@ -271,7 +215,7 @@ None,None,2013";
   d3.select("#icicle")
       .on("change", icicle)
       .each(icicle);
-//});
+});
 
 function iceTransition(g) {
   return g.transition().duration(1000);
