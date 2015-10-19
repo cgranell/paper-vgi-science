@@ -77,18 +77,22 @@ pre, code { font-family: "Menlo", monospace; }
 <div id="vis"></div>
 <div class="options">
   <span class="source"><a href="https://github.com/cgranell/paper-vgi-science">Data</a>.</span>
-  <span class="source"><a href="">Data</a>.</span>
   
   <span class="curves"><label for="curved"><input type="checkbox" id="curved" onchange="curves.call(this)"> Curves?</label></span>
 
-  The diagram is built upon the Parallel Sets JavaScript library by Jason Davies: http://www.jasondavies.com/
+</div class="options">
 
-  Citation: Ostermann, F.A. and Granell, C.(2016), Advancing Science with VGI: Reproducibility and Replicability of Recent Studies within VGI. Transaction in GIS
-</div>
+<h2>Notes</h2>
+<p>The diagram is built upon the <a href="http://www.jasondavies.com/parallel-sets/">Parallel Sets JavaScript library</a> by <a href="http://www.jasondavies.com/">Jason Davies</a>.
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<p>Citation: Ostermann, F.A. and Granell, C.(2016), Advancing Science with VGI: Reproducibility and Replicability of Recent Studies within VGI. Transactions in GIS
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>-->
+<script src="d3.min.js"></script>
 <script src="d3.parsets.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+<script src="highlight.min.js"></script>
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>-->
 
 <script>
 var chart = d3.parsets()
@@ -118,7 +122,6 @@ function curves() {
 }
 
 d3.csv("tgis.csv", function(error, csv) {
-  csv = tgis
   vis.datum(csv).call(chart);
 
   window.icicle = function() {
