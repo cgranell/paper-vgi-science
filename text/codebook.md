@@ -11,7 +11,7 @@ It describes the list of variables of our dataset of eligible papers
 * **p.venue**: Factor (several levels), the name of the venue where the paper has been presented/published. 
 * **p.venuetype**: Factor (journal/conference), publication type. 
 * **p.keyword**: Character, the list of keywords (sep ;) as they appear in the paper. Otherwise NA
-* **p.url**: Character, the link to the paper when possible. 
+* **p.doi**: Character, the doi of the paper. Otherwise its link/url. 
 * **p.geo**: Factor (strong, medium, weak), it subjectivelly qualifies the overall use of VGI and geospatial methods used in the paper.
 * **p.notes**: Character, additional comments if required. Otherwise blank space.
 * **p.abstract**: Character, the abstract of the paper.
