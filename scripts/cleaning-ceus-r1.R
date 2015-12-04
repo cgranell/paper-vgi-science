@@ -4,11 +4,11 @@
 # 
 #
 
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus/rawdata.csv"
-rawFile <- "rawdata.csv"
-dataFile <- "cleandata.rda"
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus-r1/rawdata-ceus-R1.csv"
+rawFile <- "rawdata-ceus-R1.csv"
+dataFile <- "cleandata-ceus-R1.rda"
 
-pathToRawFile <- paste("./data/ceus", rawFile, sep="")
+pathToRawFile <- paste("./data/ceus-r1/", rawFile, sep="")
 if (!file.exists(pathToRawFile)) {
     file <- download.file(url, destfile=pathToRawFile)
 }
@@ -16,7 +16,7 @@ if (!file.exists(pathToRawFile)) {
 # load raw data
 data <- read.csv(pathToRawFile, colClasses="character", header=TRUE, strip.white=TRUE)
 
-dim(data) # 93 obs. of 29 variables
+dim(data) # 97 obs. of 30 variables
 
 # convert columns names into lowercase  
 names(data) <- tolower(names(data))
@@ -28,20 +28,17 @@ str(data)
 data$p.year <- as.integer(data$p.year)
 data$p.venue <- as.factor(data$p.venue)
 data$p.venuetype <- as.factor(data$p.venuetype)
-data$p.geo <- as.factor(data$p.geo)
-data$d.official <- as.factor(data$d.official)
 data$a.type <- as.factor(data$a.type)
 data$a.tool <- as.factor(data$a.tool)
 data$f.cat0 <- as.factor(data$f.cat0)
 data$f.cat1 <- as.factor(data$f.cat1)
 data$f.cat2 <- as.factor(data$f.cat2)
 data$f.uc0 <- as.factor(data$f.uc0)
+data$f.uc1 <- as.factor(data$f.uc1)
 data$f.user <- as.factor(data$f.user)
 data$d.source <- as.factor(data$d.source)
+data$d.official <- as.factor(data$d.official)
 
-
-# "crisis-centric level of f.cat0 is renamed as "applicatin-centric" level
-levels(data$f.cat0)[levels(data$f.cat0)=="crisis-centric"] <- "application-centric"
 
 # Names of subcategories within "application-centric" are shorthen  
 levels(data$f.cat1)[levels(data$f.cat1)=="crisis management (coordination and organization)"] <- "coordination and organization"
@@ -71,20 +68,9 @@ levels(data$f.cat2)[levels(data$f.cat2)=="location selection"] <- "location sele
 levels(data$f.cat2)[levels(data$f.cat2)=="actionable information"] <- "actionable and credible information"
 levels(data$f.cat2)[levels(data$f.cat2)=="credible information"] <- "actionable and credible information"
 
-# fixed typo: "commuting behabiours" --> "commuting behaviours"
-levels(data$f.cat2)[levels(data$f.cat2)=="commuting behabiours"] <- "commuting behaviours"
-
-
-# We group some sources (d.source) which are quite similar. This will ease readiness:
-levels(data$d.source)[levels(data$d.source)=="Mutiple social media sources"] <- "Multiple sources"
-levels(data$d.source)[levels(data$d.source)=="Mutiple social media sources  (MMS messages; Web portals; blogs; Twitter; Facebook)"] <- "Multiple sources"
-levels(data$d.source)[levels(data$d.source)=="Mutiple social media sources (Flickr; Panoramio; Picasa Web; Geograph)"] <- "Multiple sources"
-
-# Merge "Synthetic cell phone data (simulated data) with "GPS data from mobile phone"
-levels(data$d.source)[levels(data$d.source)=="Synthetic cell phone data"] <- "GPS data from mobile phone"
 
 # number of representative papers 
-length(unique(data$p.id))  # 58
+length(unique(data$p.id))  # 59
 
 # Save data frame object into a local file 
-save(data, file=paste("./data/ceus/", dataFile, sep=""))
+save(data, file=paste("./data/ceus-r1/", dataFile, sep=""))
