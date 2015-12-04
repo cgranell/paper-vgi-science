@@ -7,9 +7,9 @@ library(ggplot2)## ggplot
 library(plyr)   ## ddply
 
 
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus/cleandata.rda"
-dataFile <- "cleandata.rda"
-pathToDataFile <- paste("./data/ceus/", dataFile, sep="")
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus-r1/cleandata-ceus-R1.rda"
+dataFile <- "cleandata-ceus-R1.rda"
+pathToDataFile <- paste("./data/ceus-r1/", dataFile, sep="")
 
 if (!file.exists(pathToDataFile)) {
     file <- download.file(url, destfile=pathToDataFile)
@@ -21,7 +21,7 @@ load(pathToDataFile)
 summary(data)
 
 # number of representative papers 
-numPapers <- length(unique(data$p.id))  # 58
+numPapers <- length(unique(data$p.id))  # 59
 
 
 ######################################################
@@ -104,8 +104,7 @@ legend.txt
 
 ## Print list of venues in a tabular format to add it to the paper as annex
 print.data.frame(subsetVenues0[,c("p.venue", "p.venuetype")])
-
-
+print.data.frame(subsetVenues0[,c("p.venue", "countVenue")])
 
 #################
 ### RQ3: Data sources 
@@ -134,7 +133,7 @@ subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
 # Turn NA as a factor level
 subsetSources0$d.source <- addNA(subsetSources0$d.source)
 # Rename level of a factor by index: change fourh item, NA, to "Not specified".
-levels(subsetSources0$d.source)[19] <- "Not specified"
+levels(subsetSources0$d.source)[24] <- "Not specified"
 levels(subsetSources0$d.source)
 
 ppi=600
@@ -200,11 +199,11 @@ length(unique(dc$p.id)) #40
 
 # how many papers are classified as data-centric
 hc <- data[data$f.cat0=="human-centric",]
-length(unique(hc$p.id)) #19
+length(unique(hc$p.id)) #12
 
 # how many papers are classified as applicaiton-centric
 ac <- data[data$f.cat0=="application-centric",]
-length(unique(ac$p.id)) #14
+length(unique(ac$p.id)) #25
 
 total.data <- length(unique(dc$p.id))
 total.human <- length(unique(hc$p.id))
@@ -228,7 +227,7 @@ subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise,
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/ceus-fig05a.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig04a.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
@@ -279,7 +278,7 @@ subsetUseCases0[11, c("pct")] <- percent(subsetUseCases0[11, c("countCat0")] / t
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/ceus-fig05b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig04b.jpg",width=4*ppi, height=5*ppi, res=ppi, quality=100)
 
 ## graph of counts, reorder to show counts of "f.cat0" in order
 ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
@@ -287,7 +286,7 @@ ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc
   #coord_flip() +
   theme_bw(base_family = "Times", base_size=10) + 
   #geom_text(aes(label=pct), vjust=1.5*subsetUseCases0$pct, colour="black", size=3) +
-  #scale_y_continuous(breaks=c(seq(0,60,5))) +
+  scale_y_continuous(breaks=c(seq(0,40,5))) +
   labs(x = "Main categories") + 
   labs(y = "Number of papers") + 
   #labs(title = "Number of papers by main categories") +
@@ -309,8 +308,8 @@ dev.off()
 ## Run the function length() on the value of "f.cat1" for each group (f.cat0, f.cat1) 
 ## to sum the ocurrences  of f.cat1 within each group
 subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
-                        #countCat1 = length(f.cat1))
-                        countCat1 = length(unique(f.cat1)))
+                        countCat1 = length(f.cat1))
+                        #countCat1 = length(unique(f.cat1)))
 
 # Get the sub-category (f.cat1), sorted first by category (f.cat0), then by count  
 cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
@@ -383,6 +382,7 @@ dev.off()
 ## Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
 ## to sum the ocurrences  of f.cat2 within each group
 subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise, 
+                    #countCat2 = length(f.cat2))
                     countCat2 = length(unique(p.id)))
 
 dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
@@ -403,10 +403,10 @@ dataCentric.limits <- c("data preservation",
                         "data quality and assessment")
 
 dataCentric.legend <- c("data preservation (1)",
-                        "data preparation (30)",
-                        "data policies (5)",
-                        "data contextualization (13)",
-                        "data quality and assessment (10)")
+                        "data preparation (26)",
+                        "data policies (2)",
+                        "data contextualization (15)",
+                        "data quality and assessment (14)")
 
 ############ FINAL FIGURE #################
 ppi=600
@@ -527,16 +527,12 @@ names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 humanCentric.limits <- c("human relations",
                          "human perception",
                          "human mobility", 
-                         "human behaviour", 
-                         "human activities", 
-                         "human (spatial) perceptions")
+                         "human activities")
                          
 humanCentric.legend <- c("human relations (3)",
                          "human perception (1)",
-                         "human mobility (7)", 
-                         "human behaviour (1)", 
-                         "human activities (5)", 
-                         "human (spatial) perceptions (3)")
+                         "human mobility (4)", 
+                         "human activities (5)")
                         
 ############ FINAL FIGURE #################
 ppi=600
@@ -620,10 +616,10 @@ appCentric.limits <- c("recovery and response",
                        "detection and prediction",
                        "coordination and organization")
 
-appCentric.legend <- c("recovery and response (4)",
-                       "monitoring (4)",
-                       "health (1)",
-                       "detection and prediction (4)",
+appCentric.legend <- c("recovery and response (8)",
+                       "monitoring (10)",
+                       "health (2)",
+                       "detection and prediction (5)",
                        "coordination and organization (1)")
 
 ############ FINAL FIGURE #################

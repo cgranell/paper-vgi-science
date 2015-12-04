@@ -27,9 +27,9 @@ options("scipen"=100, "digits"=0)
 
 ```{r loading_data}
 setwd("C:/Users/cgranell/Data/MyCode/paper-vgi-science/")
-url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus/cleandata.rda"
-dataFile <- "cleandata.rda"
-pathToDataFile <- paste("./data/ceus/", dataFile, sep="")
+url <- "https://github.com/cgranell/paper-vgi-science/raw/master/data/ceus-r1/cleandata-ceus-R1.rda"
+dataFile <- "cleandata-ceus-R1.rda"
+pathToDataFile <- paste("./data/ceus-r1/", dataFile, sep="")
 
 if (!file.exists(pathToDataFile)) {
     file <- download.file(url, destfile=pathToDataFile)
@@ -102,7 +102,7 @@ percent <- function(x, digits = 2, format = "f", ...) {
 R scripts below describe how the data were processed for creating figures included in the submitted paper.
 
 ### Distribution of publication venues
-What are the publication venues VGI research & data science have been published in? 
+What are the publication venues VGI research & data science have been published in? (Annex A)
 
 ```{r}
 # get the list of unique venues
@@ -122,11 +122,13 @@ rateConferences <- (sumConferences / (sumJournals + sumConferences))
 legend.txt = c(paste0("Conference: ", percent(rateConferences)), paste0("Journal: ", percent(rateJournals)))
 legend.txt
 
+## Print list of venues in a tabular format to add it to the paper as annex A
+print.data.frame(subsetVenues0[,c("p.venue", "p.venuetype", "countVenue")])
 
 ### RQ2: Focus and intended uses of papers
 ```
 
-Fig 5a shows the distribution of papers along the main categories 
+Fig 4a shows the distribution of papers along the main categories 
 ```{r}
 
 subsetCat <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "p.year")]
@@ -136,7 +138,7 @@ subsetCat0 <- ddply(subsetCat, c("f.cat0"), summarise,
 ```
 
 ```{r, echo=FALSE}
-fig5a <- ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
+fig4a <- ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) +
         geom_bar(stat="identity", width=0.4, colour="black") + 
         #coord_flip() +
         theme_bw(base_family = "Times", base_size=10) + 
@@ -144,23 +146,21 @@ fig5a <- ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=
         scale_y_continuous(breaks=c(seq(0,60,5))) +
         labs(x = "Main categories") + 
         labs(y = "Number of papers") + 
-        labs(title = "Figure 5a:  Number of papers by main category") +
+        labs(title = "Figure 4a:  Number of papers by main category") +
         scale_colour_brewer(palette="Set1") +
         theme(legend.position="none") + # remove legend
         theme(panel.grid.major.x = element_blank(),
-          panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
+        panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
 
 ```
 
-Fig5b shows the distribution of use cases along the main categories
+Fig4b shows the distribution of use cases along the main categories
 ```{r}
 subsetUseCases <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "f.uc0", "f.uc1", "p.year")]
 
 # Run the function length() on the unique values of "p.id" for each group (f.cat0, f.uc0) 
 subsetUseCases0 <- ddply(subsetUseCases, c("f.cat0", "f.uc0"), summarise, 
                          countCat0  = length(unique(p.id)))
-
-levels(subsetUseCases0$f.uc0)[levels(subsetUseCases0$f.uc0)=="natural harzards and man-made events"] <- "natural harzards and\n man-made events"
 
 # Turn NA as a factor level
 subsetUseCases0$f.uc0 <- addNA(subsetUseCases0$f.uc0)
@@ -169,15 +169,15 @@ levels(subsetUseCases0$f.uc0)[4] <- "not specified"
 ```
 
 ```{r echo=FALSE}
-fig5b <- ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
+fig4b <- ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.uc0)) +
         geom_bar(stat="identity", width=0.4, colour="black") + 
         #coord_flip() +
         theme_bw(base_family = "Times", base_size=10) + 
         #geom_text(aes(label=countCat0), vjust=1.5, colour="black", size=3) +
-        #scale_y_continuous(breaks=c(seq(0,60,5))) +
+        scale_y_continuous(breaks=c(seq(0,40,5))) +
         labs(x = "Main categories") + 
         labs(y = "Number of papers") + 
-        labs(title = "Figure5b: Overall use cases by main category") +
+        labs(title = "Figure4b: Overall use cases by main category") +
         scale_color_brewer(palette="Set2") +
         labs(fill="Use cases") +   # set the legend title
         theme(legend.position=c(0,1), legend.justification=c(0,1)) +  # set legend position inside graphic, tpo-left position    
@@ -189,11 +189,11 @@ fig5b <- ggplot(subsetUseCases0, aes(x=reorder(f.cat0, countCat0), y=countCat0, 
 
 ```{r echo=FALSE}
 suppressWarnings(grid.newpage())
-suppressWarnings(grid.arrange(fig5a, fig5b, ncol=2, nrow=1))
+suppressWarnings(grid.arrange(fig4a, fig4b, ncol=2, nrow=1))
 ```
 
 
-Fig 6 shows the distribution of sub-categories/focuses within each category. (Note 19 Aug 2015: This figure will not be part of the paper. Instead, we have updated the next three figures to add the total number of papers per subcategory in parenthesis in the legend. For the time being, this figure is still relevant for internal use in case more papers are added to the review)
+Next Figure shows the distribution of sub-categories/focuses within each category. (Note 19 Aug 2015: This figure will not be part of the paper. Instead, we have updated the next three figures to add the total number of papers per subcategory in parenthesis in the legend. For the time being, this figure is still relevant for internal use in case more papers are added to the review)
 
 ```{r}
 # Run the function length() on the unique value of "p.id" for each group (f.cat0, f.cat1) 
@@ -208,7 +208,7 @@ subsetCat1$f.cat1 <- factor(subsetCat1$f.cat1, levels=cat1order)
 ```
 
 ```{r echo=FALSE}
-fig6 <- ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
+figOut <- ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
         geom_bar(stat="identity", width=0.6, colour="black") + 
         coord_flip() +
         theme_bw(base_family = "Times", base_size=10) + 
@@ -225,18 +225,19 @@ fig6 <- ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
         labs(title = "Figure 6: Number of papers by category and sub-category (or focus)") +
 
 suppressWarnings(grid.newpage())
-suppressWarnings(grid.arrange(fig6, ncol=1, nrow=1))
+suppressWarnings(grid.arrange(figOut, ncol=1, nrow=1))
 ```
 
 
-Fig 7 shows the most frequently intended uses within the data-centric category
+Fig 5 shows the most frequently intended uses within the data-centric category
  
  
 ```{r}
 # Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
 # to sum the ocurrences  of f.cat2 within each group
 subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise, 
-                    countCat2 = length(f.cat2))
+                    #countCat2 = length(f.cat2))
+                    countCat2 = length(unique(p.id)))
 
 dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
 
@@ -256,15 +257,15 @@ dataCentric.limits <- c("data preservation",
                         "data quality and assessment")
 
 dataCentric.legend <- c("data preservation (1)",
-                        "data preparation (30)",
-                        "data policies (5)",
-                        "data contextualization (13)",
-                        "data quality and assessment (10)")
+                        "data preparation (26)",
+                        "data policies (2)",
+                        "data contextualization (15)",
+                        "data quality and assessment (14)")
 
 ```
 
 ```{r echo=FALSE}
-fig7 <- ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+fig5 <- ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
         geom_bar(stat="identity", width=0.6, colour="black") + 
         coord_flip() +
         theme_bw(base_family = "Times", base_size=10) +
@@ -272,7 +273,7 @@ fig7 <- ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
         scale_y_continuous(breaks=c(seq(0,15,1))) +
         labs(y = "Number of papers") + 
         labs(x = "Intended uses within data-centric category") + 
-        labs(title = "Figure 7:  Intended uses by focus (sub-category) within the data-centric category") +
+        labs(title = "Figure 5:  Intended uses by focus (sub-category) within the data-centric category") +
         geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
         theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-roght position    
         theme(legend.background=element_blank()) + # Remove overall border of legend
@@ -283,11 +284,11 @@ fig7 <- ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
         theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
 suppressWarnings(grid.newpage())
-suppressWarnings(grid.arrange(fig7, ncol=1, nrow=1))
+suppressWarnings(grid.arrange(fig5, ncol=1, nrow=1))
 names(dataCentric)[names(dataCentric)=="Focus"]  <- "f.cat1"
 ```
 
-Fig 8 shows the most frequently intended uses within the human-centric category
+Fig 6 shows the most frequently intended uses within the human-centric category
 ```{r}
 humanCentric <- subset(subsetCat2,f.cat0=="human-centric")
 # Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
@@ -302,20 +303,16 @@ names(humanCentric)[names(humanCentric)=="f.cat1"]  <- "Focus"
 humanCentric.limits <- c("human relations",
                          "human perception",
                          "human mobility", 
-                         "human behaviour", 
-                         "human activities", 
-                         "human (spatial) perceptions")
+                         "human activities")
                          
 humanCentric.legend <- c("human relations (3)",
                          "human perception (1)",
-                         "human mobility (7)", 
-                         "human behaviour (1)", 
-                         "human activities (5)", 
-                         "human (spatial) perceptions (3)")
+                         "human mobility (4)", 
+                         "human activities (5)")
 ```
 
 ```{r echo=FALSE}
-fig8 <- ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+fig6 <- ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
         geom_bar(stat="identity", width=0.6, colour="black") +
         coord_flip() +
         theme_bw(base_family = "Times", base_size=10) +
@@ -323,7 +320,7 @@ fig8 <- ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
         scale_y_continuous(breaks=c(seq(0,3,1))) +
         labs(y = "Number of papers") + 
         labs(x = "Intended uses within human-centric category") + 
-        labs(title = "Figure 8: Intended uses by focus (sub-category) within the human-centric category") +
+        labs(title = "Figure 6: Intended uses by focus (sub-category) within the human-centric category") +
         geom_text(aes(label=countCat2), hjust=1.5, colour="black", size=3) +
         guides(fill=guide_legend(title="Focus")) +  # Set the legend title
         scale_fill_discrete(
@@ -335,12 +332,12 @@ fig8 <- ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
         theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
 suppressWarnings(grid.newpage())
-suppressWarnings(grid.arrange(fig8, ncol=1, nrow=1))
+suppressWarnings(grid.arrange(fig6, ncol=1, nrow=1))
 names(humanCentric)[names(humanCentric)=="Focus"]  <- "f.cat1"
 ```
 
 
-Fig 9 shows the most frequently intended uses within the application-centric category
+Fig 7 shows the most frequently intended uses within the application-centric category
 ```{r}
 applicationCentric <- subset(subsetCat2,f.cat0=="application-centric")
 # Get the intended uses (f.cat2), sorted first by cat1 (focus), then by count  
@@ -358,16 +355,16 @@ appCentric.limits <- c("recovery and response",
                        "detection and prediction",
                        "coordination and organization")
 
-appCentric.legend <- c("recovery and response (4)",
-                       "monitoring (4)",
-                       "health (1)",
-                       "detection and prediction (4)",
+appCentric.legend <- c("recovery and response (8)",
+                       "monitoring (10)",
+                       "health (2)",
+                       "detection and prediction (5)",
                        "coordination and organization (1)")
 
 ```
 
 ```{r echo=FALSE}
-fig9 <- ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
+fig7 <- ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
         geom_bar(stat="identity", width=0.6, colour="black") +
         coord_flip() +
         theme_bw(base_family = "Times", base_size=10) +
@@ -386,7 +383,7 @@ fig9 <- ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +
         theme(panel.grid.major.y = element_blank()) # No horizontal grid lines
 
 suppressWarnings(grid.newpage())
-suppressWarnings(grid.arrange(fig9, ncol=1, nrow=1))
+suppressWarnings(grid.arrange(fig7, ncol=1, nrow=1))
 names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
 ```
 
@@ -394,7 +391,7 @@ names(applicationCentric)[names(applicationCentric)=="Focus"]  <- "f.cat1"
 
 ### RQ3: Data Sources
 
-Fig 10 shows the most frequently VGI sources
+Fig 8 shows the most frequently VGI sources by main category
 ```{r}
 subsetSources <- getUniqueSources()
 
@@ -411,30 +408,30 @@ subsetSources0$d.source <- factor(subsetSources0$d.source, levels=sourceorder)
 # Turn NA as a factor level
 subsetSources0$d.source <- addNA(subsetSources0$d.source)
 # Rename level of a factor by index: change fourh item, NA, to "Not specified".
-levels(subsetSources0$d.source)[19] <- "Not specified"
+levels(subsetSources0$d.source)[24] <- "Not specified"
 ```
 
 ```{r echo=FALSE}
-fig10 <- ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
+fig8 <- ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
         geom_point(aes(size=countSource), shape=21, colour="black") +
         scale_size_area(max_size=15, guide=FALSE) + 
         theme_bw(base_family = "Times", base_size=10) + 
         guides(fill=FALSE) +
         labs(x = "Main categories") + 
         labs(y = "VGI source") +
-        labs(title = "Figure 10:  VGI sources used by main category") +
+        labs(title = "Figure 8:  VGI sources used by main category") +
         scale_colour_brewer(palette="Set1") +
         geom_text(aes(label=countSource), vjust=0.1, colour="grey30", size=2)+   # Add labels from data
         theme(panel.grid.major.x = element_blank()) # Hide the vertical grid lines
 
 
 suppressWarnings(grid.newpage())
-suppressWarnings(grid.arrange(fig10, ncol=1, nrow=1))
+suppressWarnings(grid.arrange(fig8, ncol=1, nrow=1))
 
 ```
 
 ## Distribution of intended uses over time 
-Fig 11 shows the distribution of intended uses over time by main category
+Fig 9 shows the distribution of intended uses over time by main category
 
 ```{r}
 # Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2, p.year) 
@@ -449,7 +446,7 @@ subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
 ```
 
 ```{r echo=FALSE}
-fig11 <- ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
+fig9 <- ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
         geom_point(aes(size=countCat3)) + 
         scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
         theme_bw(base_family = "Times", base_size=10) + 
@@ -461,7 +458,7 @@ fig11 <- ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
         geom_text(aes(label=countCat3), vjust=0.1, colour="black", size=2)   # Add labels from data
 
 suppressWarnings(grid.newpage())
-suppressWarnings(grid.arrange(fig11, ncol=1, nrow=1))
+suppressWarnings(grid.arrange(fig9, ncol=1, nrow=1))
 ```
 
 
