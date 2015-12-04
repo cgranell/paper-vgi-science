@@ -195,7 +195,7 @@ dev.off()
 
 # how many papers are classified as data-centric
 dc <- data[data$f.cat0=="data-centric",]
-length(unique(dc$p.id)) #40
+length(unique(dc$p.id)) #41
 
 # how many papers are classified as data-centric
 hc <- data[data$f.cat0=="human-centric",]
@@ -203,7 +203,7 @@ length(unique(hc$p.id)) #12
 
 # how many papers are classified as applicaiton-centric
 ac <- data[data$f.cat0=="application-centric",]
-length(unique(ac$p.id)) #25
+length(unique(ac$p.id)) #24
 
 total.data <- length(unique(dc$p.id))
 total.human <- length(unique(hc$p.id))
@@ -406,7 +406,7 @@ dataCentric.legend <- c("data preservation (1)",
                         "data preparation (26)",
                         "data policies (2)",
                         "data contextualization (15)",
-                        "data quality and assessment (14)")
+                        "data quality and assessment (15)")
 
 ############ FINAL FIGURE #################
 ppi=600
@@ -617,7 +617,7 @@ appCentric.limits <- c("recovery and response",
                        "coordination and organization")
 
 appCentric.legend <- c("recovery and response (8)",
-                       "monitoring (10)",
+                       "monitoring (9)",
                        "health (2)",
                        "detection and prediction (5)",
                        "coordination and organization (1)")

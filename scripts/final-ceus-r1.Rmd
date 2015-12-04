@@ -259,7 +259,7 @@ dataCentric.legend <- c("data preservation (1)",
                         "data preparation (26)",
                         "data policies (2)",
                         "data contextualization (15)",
-                        "data quality and assessment (14)")
+                        "data quality and assessment (15)")
 
 ```
 
@@ -355,7 +355,7 @@ appCentric.limits <- c("recovery and response",
                        "coordination and organization")
 
 appCentric.legend <- c("recovery and response (8)",
-                       "monitoring (10)",
+                       "monitoring (9)",
                        "health (2)",
                        "detection and prediction (5)",
                        "coordination and organization (1)")
