@@ -1,7 +1,7 @@
 ---
-title: "VGI papers analysis for creating final figures included in submitted paper"
+title: "Analysis for creating final figures included in CEUS paper, Review 1 paper"
 author: "Carlos Granell"
-date: "August 2015"
+date: "Dec 2015"
 output: html_document
 ---
 
@@ -123,12 +123,12 @@ legend.txt = c(paste0("Conference: ", percent(rateConferences)), paste0("Journal
 legend.txt
 
 ## Print list of venues in a tabular format to add it to the paper as annex A
-print.data.frame(subsetVenues0[,c("p.venue", "p.venuetype", "countVenue")])
+print.data.frame(subsetVenues0[,c("p.venue", "countVenue")])
 
 ### RQ2: Focus and intended uses of papers
 ```
 
-Fig 4a shows the distribution of papers along the main categories 
+Fig 4a shows the distribution of papers along the main categories. Note: 5 papers are marked as data-centric and human-centric, and 13 papers are marked as data-centric and application-centric. So 18 paper have two main categorie. In total, 59 + 18 = 77, which is the sum of the three bars in Fig 4a.
 ```{r}
 
 subsetCat <- data[,c("p.id", "f.cat0","f.cat1", "f.cat2", "p.year")]
@@ -196,10 +196,10 @@ suppressWarnings(grid.arrange(fig4a, fig4b, ncol=2, nrow=1))
 Next Figure shows the distribution of sub-categories/focuses within each category. (Note 19 Aug 2015: This figure will not be part of the paper. Instead, we have updated the next three figures to add the total number of papers per subcategory in parenthesis in the legend. For the time being, this figure is still relevant for internal use in case more papers are added to the review)
 
 ```{r}
-# Run the function length() on the unique value of "p.id" for each group (f.cat0, f.cat1) 
+# # Run the function length() on the unique values of "p.id" for each group (f.cat0, f.cat1) 
 # to sum the ocurrences  of f.cat1 within each group
 subsetCat1 <- ddply(subsetCat, c("f.cat0", "f.cat1"), summarise, 
-                        countCat1 = length(f.cat1))
+                        countCat1 = length(unique(p.id)))
 
 # Get the sub-category (f.cat1), sorted first by category (f.cat0), then by count  
 cat1order <- subsetCat1$f.cat1[order(subsetCat1$f.cat0, subsetCat1$countCat1)]
@@ -222,7 +222,7 @@ figOut <- ggplot(subsetCat1, aes(x=f.cat1, y=countCat1, fill=f.cat0)) +
         guides(fill=guide_legend(title="Main categories")) +  # Set the legend title
         theme(legend.position=c(1,.1), legend.justification=c(1,0)) +  # set legend position inside graphic, bottom-right position    
         theme(legend.background=element_blank()) + # Remove overall border of legend
-        labs(title = "Figure 6: Number of papers by category and sub-category (or focus)") +
+        labs(title = "Figure: Number of papers by category and sub-category (or focus)") +
 
 suppressWarnings(grid.newpage())
 suppressWarnings(grid.arrange(figOut, ncol=1, nrow=1))
@@ -233,10 +233,9 @@ Fig 5 shows the most frequently intended uses within the data-centric category
  
  
 ```{r}
-# Run the function length() on the value of "f.cat2" for each group (f.cat0, f.cat1, f.cat2) 
+# Run the function length() the unique values of "p.id" for each group (f.cat0, f.cat1, f.cat2) 
 # to sum the ocurrences  of f.cat2 within each group
 subsetCat2 <- ddply(subsetCat, c("f.cat0", "f.cat1", "f.cat2"), summarise, 
-                    #countCat2 = length(f.cat2))
                     countCat2 = length(unique(p.id)))
 
 dataCentric <- subset(subsetCat2,f.cat0=="data-centric")
