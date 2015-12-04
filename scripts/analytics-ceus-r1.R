@@ -120,7 +120,7 @@ subsetSources <- getUniqueSources()
 subsetSources0 <- ddply(subsetSources, c("f.cat0", "f.cat1", "d.source"), summarise, 
                        countSource  = as.integer(table(d.source)))
 
-subsetSources0 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
+subsetSources1 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
                         countSource  = length(d.source))
 
 # Get the sources  (d.source), sorted first by category (f.cat0), then by count  

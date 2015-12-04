@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1449231876239.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "4EECFC6F",
+    "lastKnownWriteTime" : 21673775076540532,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "9poi2ub7fn",
+        "caption" : "subsetCat",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=subsetCat&cache_key=9poi2ub7fn",
+        "displayedObservations" : "97",
+        "environment" : "",
+        "object" : "subsetCat",
+        "totalObservations" : "97",
+        "variables" : "5"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

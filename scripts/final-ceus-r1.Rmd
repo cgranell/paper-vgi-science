@@ -394,7 +394,7 @@ Fig 8 shows the most frequently VGI sources by main category
 ```{r}
 subsetSources <- getUniqueSources()
 
-# Run the function table() on the value of "d.source" for each group (d.source, d.official)
+# Run the function table() on the value of "d.source" for each aggregated group at level "f.cat0"
 subsetSources0 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
                         countSource  = length(d.source))
 
