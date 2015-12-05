@@ -120,7 +120,7 @@ subsetSources <- getUniqueSources()
 subsetSources0 <- ddply(subsetSources, c("f.cat0", "f.cat1", "d.source"), summarise, 
                        countSource  = as.integer(table(d.source)))
 
-subsetSources1 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
+subsetSources0 <- ddply(subsetSources, c("f.cat0", "d.source"), summarise, 
                         countSource  = length(d.source))
 
 # Get the sources  (d.source), sorted first by category (f.cat0), then by count  
@@ -137,7 +137,7 @@ levels(subsetSources0$d.source)[24] <- "Not specified"
 levels(subsetSources0$d.source)
 
 ppi=600
-jpeg(filename = "./figures/ceus-fig10.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig8-new.jpg",width=8*ppi, height=5*ppi, res=ppi, quality=100)
 ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
   geom_point(aes(size=countSource), shape=21, colour="black") +
   scale_size_area(max_size=15, guide=FALSE) + 
@@ -146,7 +146,7 @@ ggplot(subsetSources0, aes(x=f.cat0, y=d.source, fill=f.cat0)) +
   labs(x = "Main categories") + 
   labs(y = "VGI source") +
   #labs(title = "Figure 10:  VGI sources used by main category") +
-  scale_colour_brewer(palette="Set1") +
+  scale_colour_brewer(palette="Set2") +
   geom_text(aes(label=countSource), vjust=-0.1, colour="grey30", size=2)+   # Add labels from data
   theme(panel.grid.major.x = element_blank()) # Hide the veritical grid lines
 dev.off()
@@ -239,7 +239,7 @@ ggplot(subsetCat0, aes(x=reorder(f.cat0, countCat0), y=countCat0, fill=f.cat0)) 
     labs(x = "Main categories") + 
     labs(y = "Number of papers") + 
     #labs(title = "Number of papers by main categories") +
-    scale_colour_brewer(palette="Set1") +
+    scale_colour_brewer(palette="Set2") +
     theme(legend.position="none") + # remove legend
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) # Hide the horizontal grid lines
@@ -410,13 +410,13 @@ dataCentric.legend <- c("data preservation (1)",
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/ceus-fig07.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig05.jpg",width=9*ppi, height=5*ppi, res=ppi, quality=100)
 
 ggplot(dataCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.6, colour="black") + 
     coord_flip() +
     theme_bw(base_family = "Times", base_size=10) +
-    scale_colour_brewer(palette="Set1") +
+    scale_colour_brewer(palette="Set2") +
     scale_y_continuous(breaks=c(seq(0,15,1))) +
     labs(y = "Number of papers") + 
     labs(x = "Intended uses within data-centric category") + 
@@ -536,14 +536,14 @@ humanCentric.legend <- c("human relations (3)",
                         
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/ceus-fig08.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig06.jpg",width=6*ppi, height=5*ppi, res=ppi, quality=100)
 
     
 ggplot(humanCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.6, colour="black") +
     coord_flip() +
     theme_bw(base_family = "Times", base_size=10) +
-    scale_colour_brewer(palette="Set1") +
+    scale_colour_brewer(palette="Set2") +
     scale_y_continuous(breaks=c(seq(0,3,1))) +
     labs(y = "Number of papers") + 
     labs(x = "Intended uses within human-centric category") + 
@@ -624,7 +624,7 @@ appCentric.legend <- c("recovery and response (8)",
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/ceus-fig09.jpg",width=6*ppi, height=4*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig07.jpg",width=6*ppi, height=4*ppi, res=ppi, quality=100)
 
 ggplot(applicationCentric, aes(x=f.cat2, y=countCat2, fill=Focus)) +    
     geom_bar(stat="identity", width=0.6, colour="black") +
@@ -696,7 +696,7 @@ subsetCat3$f.cat2 <- factor(subsetCat3$f.cat2, levels=cat2order)
 
 ############ FINAL FIGURE #################
 ppi=600
-jpeg(filename = "./figures/ceus-fig11.jpg",width=6*ppi, height=9*ppi, res=ppi, quality=100)
+jpeg(filename = "./figures/ceus-fig9-new.jpg",width=6*ppi, height=9*ppi, res=ppi, quality=100)
 ggplot(subsetCat3, aes(x=p.year, y=f.cat2, colour=f.cat0)) +
     geom_point(aes(size=countCat3)) + 
     scale_size_continuous(range=c(1,6)) +  # range of values for dots size (number of papers)
